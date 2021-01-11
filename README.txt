@@ -1,11 +1,12 @@
-FRC Team 4624's 2020-Robot-Code
- All software for the Rebel Alliance's 2020 season and its game, Infinite
-  Recharge.
+FRC Team 4624's 2021-Robot-Code
+ All software for the Rebel Alliance's 2021 season and its game, Infinite
+ Recharge. This code is a continuation of the Rebel Alliance's 2020 robot
+ code, which can be found [here](https://github.com/Wizzrobes/2020-Robot-Code).
 
- 2020-Robot
-  The primary project for 2020: commanding Zion to play this year's game.
+ 2021-Robot
+  The primary project for 2021: commanding Zion to play this year's game.
   Description
-   4624's 2020 robot resides on a swerve drivetrain based on Team 2910's
+   4624's 2021 robot resides on a swerve drivetrain based on Team 2910's
     Swerve Drive Specialties MKII swerve modules. Controlling this is
     the first objective of the project, with movement and rotation in
     any direction and of any combination. Methods then exist for
@@ -19,7 +20,7 @@ FRC Team 4624's 2020-Robot-Code
     description of each class and method exists at the beginning
     of its respective header file.
   Compiling/Usage
-   This is a 2020 WPILib project which uses vendor libraries from
+   This is a 2021 WPILib project which uses vendor libraries from
     REV and Kaui for motor controller and sensor functionality.
     With an up-to-date install of WPILib VSCode and these
     vendor libraries installed, the project can be imported
