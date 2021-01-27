@@ -12,6 +12,7 @@ class AutoSequence : public AutoStep {
             m_currentStep = m_steps.begin();
             m_lastStep = m_steps.end();
             m_currentStep->Init();
+            m_isDone = false;
         }
 
         bool Execute() {
@@ -22,6 +23,7 @@ class AutoSequence : public AutoStep {
                 if (m_currentStep != m_lastStep) {
                     
                     m_currentStep++;
+                    m_currentStep->Init();
                 }
                 else {
 
@@ -38,8 +40,17 @@ class AutoSequence : public AutoStep {
             m_steps.push_back(&refStep);
         }
 
+        void Run() {
+
+            if (!m_isDone) {
+
+                m_isDone = Execute();
+            }
+        }
+
     private:
         std::vector<AutoStep*> m_steps;
         std::vector<AutoStep*>::iterator m_currentStep;
         std::vector<AutoStep*>::iterator m_lastStep;
+        bool m_isDone;
 };

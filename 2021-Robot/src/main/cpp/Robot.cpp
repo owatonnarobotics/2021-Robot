@@ -16,6 +16,7 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 #include "auto/AutoStep.h"
+#include "auto/AutoSequence.h"
 #include "auto/steps/AssumeDirection.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
@@ -33,6 +34,7 @@ SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwer
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
+AutoSequence masterAuto();
 
 void Robot::RobotInit() {
 
@@ -70,17 +72,8 @@ void Robot::AutonomousInit() {
     zion.setZeroPosition();
     //Get which auto was selected to run in auto to test against.
     m_chooserAutoSelected = m_chooserAuto->GetSelected();
-}
-void Robot::AutonomousPeriodic() {
 
-    //Lock the drive wheels before beginning for accuracy.
-    zion.setDriveBrake(true);
-
-    //Run whichever auto we selected, setting the string to garbage
-    //once it is complete so that it only runs once. This way, only one loop
-    //has to be controlled. See Hal.h for examples of how complex autonomous
-    //control is accomplished with flow-of-control.
-    //Do-Nothing does nothing, default.
+    //Run whichever auto we selected
     if (m_chooserAutoSelected == "doNothing") {
 
         m_chooserAutoSelected = "done";
@@ -88,17 +81,11 @@ void Robot::AutonomousPeriodic() {
     //If-We-Gotta-Do-It simply drives off the line.
     if (m_chooserAutoSelected == "dotl") {
 
-        if (m_autoStep == 0 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
-
-            m_autoStep = 1;
-        }
-        if (m_autoStep == 1 && Hal9000.zionAssumeDistance(30)) {
-
-            m_chooserAutoSelected = "done";
-        }
+        masterAuto.Add(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.Add(new AssumeDistance(zion, 30));
     }
     //Three-Cell unloads three cells and drives off the line.
-    if (m_chooserAutoSelected == "threeCell") {
+    /*if (m_chooserAutoSelected == "threeCell") {
 
         //Spin up launcher, feed it cells, turn it off, and drive off the line.
         if (m_autoStep == 0) {
@@ -120,7 +107,14 @@ void Robot::AutonomousPeriodic() {
 
             m_chooserAutoSelected = "done";
         }
-    }
+    }*/
+}
+void Robot::AutonomousPeriodic() {
+
+    //Lock the drive wheels before beginning for accuracy.
+    zion.setDriveBrake(true);
+    //Run the auto!
+    masterAuto.Execute();
 }
 void Robot::TeleopInit() {
 
