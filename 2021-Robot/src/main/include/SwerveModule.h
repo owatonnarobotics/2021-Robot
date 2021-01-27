@@ -88,7 +88,6 @@ Private Methods
 #include "rev/CANSparkMax.h"
 
 #include "RobotMap.h"
-#include "VectorDouble.h"
 
 class SwerveModule {
 

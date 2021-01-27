@@ -15,6 +15,8 @@
 #include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
+#include "auto/AutoStep.h"
+#include "auto/steps/AssumeDirection.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);

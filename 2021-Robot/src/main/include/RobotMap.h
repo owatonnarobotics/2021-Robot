@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+#include "VectorDouble.h"
+
 /*_____RoboRIO PWM Pin Declarations_____*/
 const int R_PWMPortClimberMotorClimb     = 0;
 const int R_PWMPortClimberServoLock      = 1;
@@ -107,3 +109,10 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = 
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 /*___End Global Robot Variable Settings___*/
+
+//TODO: Why inverted?
+const VectorDouble R_zionVectorRight(-1,0);
+const VectorDouble R_zionVectorBackward(0,1);
+const VectorDouble R_zionVectorLeft(1,0);
+
+const double R_circumfrenceWheel = 4 * M_PI;

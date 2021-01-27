@@ -171,6 +171,15 @@ class SwerveTrain {
             m_rearRight->assumeSwerveNearestZeroPosition();
         }
 
+        void setZionMotorsToVector(const VectorDouble &vectorToSet) {
+
+            m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+        }
+
+
         void publishSwervePositions() {
 
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosFR", m_frontRight->getSwervePosition());
@@ -261,4 +270,9 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
         NavX *navX;
+
+        enum ZionDirections {
+
+            kForward, kRight, kBackward, kLeft
+        };
 };
