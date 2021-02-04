@@ -1,16 +1,21 @@
+#ifndef ASSUMEDIRECTION_H
+#define ASSUMEDIRECTION_H
+
+#include <string>
+
 #include "SwerveTrain.h"
 #include "RobotMap.h"
 
 class AssumeDirection : public AutoStep {
 
     public:
-        AssumeDirection(SwerveTrain &refZion, const int &directionToMove) {
+        AssumeDirection(SwerveTrain &refZion, const int &directionToMove) : AutoStep("AssumeDirection") {
 
             m_zion = &refZion;
             m_directionToMove = directionToMove;
         }
 
-        void Init() {
+        void _Init() {
 
             m_initialSwervePosition = m_zion->m_frontRight->getSwervePosition();
             m_targetRevRotationsFromCenter = m_zion->getClockwiseREVRotationsFromCenter(
@@ -22,7 +27,7 @@ class AssumeDirection : public AutoStep {
             );
         }
 
-        bool Execute() {
+        bool _Execute() {
 
             switch (m_directionToMove) {
 
@@ -62,7 +67,7 @@ class AssumeDirection : public AutoStep {
             }
         }
 
-        void Cleanup() {}
+        void _Cleanup() {}
 
     private:
         SwerveTrain* m_zion;
@@ -70,3 +75,5 @@ class AssumeDirection : public AutoStep {
         double m_targetRevRotationsFromCenter;
         int m_directionToMove;
 };
+
+#endif

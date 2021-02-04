@@ -7,13 +7,23 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(frc::Joystick *controller, bool precision = false) {
+void SwerveTrain::driveController(frc::Joystick *controller, const bool useVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0, const bool precision = false) {
 
-    //TODO: Why does inverting certain things work?
-    double x = -controller->GetX();
-    double y = -controller->GetY();
-    //Limit the Z axis by the cap, as turning can be violent
-    double z = controller->GetZ() * R_executionCapZion;
+    double x, y, z;
+    if (useVirtual) {
+
+        x = virtualX;
+        y = virtualY;
+        z = virtualZ;
+    }
+    else {
+
+        //TODO: Why does inverting certain things work?
+        x = -controller->GetX();
+        y = -controller->GetY();
+        //Limit the Z axis by the cap, as turning can be violent
+        z = controller->GetZ() * R_executionCapZion;
+    }
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.

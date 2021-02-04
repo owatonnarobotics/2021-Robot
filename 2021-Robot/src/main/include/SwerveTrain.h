@@ -188,7 +188,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::Joystick *controller, bool precision);
+        void driveController(frc::Joystick *controller, const bool isVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0, const bool precision = false);
         void zeroController(frc::Joystick *controller);
 
     private:

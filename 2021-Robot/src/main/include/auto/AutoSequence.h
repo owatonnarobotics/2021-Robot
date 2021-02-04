@@ -1,3 +1,6 @@
+#ifndef AUTOSEQUENCE_H
+#define AUTOSEQUENCE_H
+
 #include <vector>
 
 #include "AutoStep.h"
@@ -5,52 +8,55 @@
 class AutoSequence : public AutoStep {
 
     public:
-        AutoSequence() {}
+        AutoSequence() : AutoStep("AutoSequence") {}
 
-        void Init() {
+        void _Init() {
 
             m_currentStep = m_steps.begin();
-            m_lastStep = m_steps.end();
-            m_currentStep->Init();
-            m_isDone = false;
+            if (m_currentStep != 0) {
+                m_lastStep = std::prev(m_steps.end());
+                m_done = m_currentStep == m_lastStep;
+                if (!m_done) (*m_currentStep)->Init();
+            }
+            else {
+
+                m_done = true;
+            }
         }
 
-        bool Execute() {
+        bool _Execute() {
 
-            if (m_currentStep->Execute()) {
+            if (!m_done) {
+                
+                if ((*m_currentStep)->Execute()) {
 
-                m_currentStep->Cleanup();
-                if (m_currentStep != m_lastStep) {
-                    
-                    m_currentStep++;
-                    m_currentStep->Init();
-                }
-                else {
+                    (*m_currentStep)->Cleanup();
+                    if (m_currentStep != m_lastStep) {
+                        
+                        m_currentStep++;
+                        (*m_currentStep)->Init();
+                    }
+                    else {
 
-                    return true;
+                        m_done = true;
+                    }
                 }
             }
-            return false;
+            return m_done;
         }
 
-        void Cleanup() {}
+        void _Cleanup() {}
 
-        void AddStep(AutoStep &refStep) {
+        void AddStep(AutoStep* refStep) {
 
-            m_steps.push_back(&refStep);
-        }
-
-        void Run() {
-
-            if (!m_isDone) {
-
-                m_isDone = Execute();
-            }
+            m_steps.push_back(refStep);
         }
 
     private:
         std::vector<AutoStep*> m_steps;
         std::vector<AutoStep*>::iterator m_currentStep;
         std::vector<AutoStep*>::iterator m_lastStep;
-        bool m_isDone;
+        bool m_done;
 };
+
+#endif

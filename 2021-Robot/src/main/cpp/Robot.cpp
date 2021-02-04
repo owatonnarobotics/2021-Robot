@@ -18,6 +18,7 @@
 #include "auto/AutoStep.h"
 #include "auto/AutoSequence.h"
 #include "auto/steps/AssumeDirection.h"
+#include "auto/steps/AssumeDistance.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -34,7 +35,7 @@ SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwer
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
-AutoSequence masterAuto();
+AutoSequence masterAuto;
 
 void Robot::RobotInit() {
 
@@ -72,42 +73,15 @@ void Robot::AutonomousInit() {
     zion.setZeroPosition();
     //Get which auto was selected to run in auto to test against.
     m_chooserAutoSelected = m_chooserAuto->GetSelected();
-
-    //Run whichever auto we selected
-    if (m_chooserAutoSelected == "doNothing") {
-
-        m_chooserAutoSelected = "done";
-    }
+    
     //If-We-Gotta-Do-It simply drives off the line.
     if (m_chooserAutoSelected == "dotl") {
 
-        masterAuto.Add(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
-        masterAuto.Add(new AssumeDistance(zion, 30));
+        masterAuto.AddStep(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 30));
     }
-    //Three-Cell unloads three cells and drives off the line.
-    /*if (m_chooserAutoSelected == "threeCell") {
 
-        //Spin up launcher, feed it cells, turn it off, and drive off the line.
-        if (m_autoStep == 0) {
-
-            Wait(frc::SmartDashboard::GetNumber("Field::Auto::3Cell-Delay", 0));
-            launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunchClose);
-            Wait(1);
-            launcher.setIndexSpeed(R_launcherDefaultSpeedIndex);
-            Wait(5);
-            launcher.setLaunchSpeed(0);
-            launcher.setIndexSpeed(0);
-            m_autoStep = 1;
-        }
-        if (m_autoStep == 1 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
-
-            m_autoStep = 2;
-        }
-        if (m_autoStep == 2 && Hal9000.zionAssumeDistance(30)) {
-
-            m_chooserAutoSelected = "done";
-        }
-    }*/
+    masterAuto.Init();
 }
 void Robot::AutonomousPeriodic() {
 
@@ -121,6 +95,7 @@ void Robot::TeleopInit() {
     //To clean up adter auto, confirm the swerves are locked and unlock
     //the drive train, and go to the pre-calibrated zero position set up at the
     //beginning of auto to begin the match.
+    zion.setZeroPosition();
     zion.setSwerveBrake(true);
     zion.setDriveBrake(false);
     zion.assumeNearestZeroPosition();
@@ -136,6 +111,9 @@ void Robot::TeleopPeriodic() {
         navX.resetYaw();
     }
     zion.driveController(playerOne, playerOne->GetRawButton(12));
+
+    //zion.setSwerveSpeed(0);
+    //zion.setSwerveSpeed(0);
 
 
     //The second controller works in control layers on top of the basic
@@ -204,11 +182,11 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetXButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
+            m_speedLauncherLaunch = 0.65;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
         }
         if (playerTwo->GetBButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
+            m_speedLauncherLaunch = 0.4;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
         }
         if (!playerTwo->GetXButton() && !playerTwo->GetBButton()) {
 

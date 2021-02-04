@@ -1,3 +1,8 @@
+#ifndef ASSUMEROTATIONDEGREES_H
+#define ASSUMEROTATIONDEGREES_H
+
+#include <string>
+
 #include "SwerveTrain.h"
 #include "Limelight.h"
 #include "NavX.h"
@@ -5,7 +10,12 @@
 class AssumeRotationDegrees : public AutoStep {
 
     public:
-        AssumeRotationDegrees(SwerveTrain &refZion, Limelight &refLimelight, NavX &refNavX, const double &degreesToRotate) {
+        AssumeRotationDegrees(
+            SwerveTrain &refZion,
+            Limelight &refLimelight,
+            NavX &refNavX,
+            const double &degreesToRotate
+        ) : AutoStep("AssumeRotationDegrees") {
 
             m_zion = &refZion;
             m_limelight = &refLimelight;
@@ -13,13 +23,13 @@ class AssumeRotationDegrees : public AutoStep {
             m_targetDegreesToRotate = degreesToRotate;
         }
 
-        void Init() {
+        void _Init() {
 
             m_initalAngle = m_navX->getAngle();
             m_resultingAngle = m_utilityVarOne + degreesToRotate;
         }
 
-        bool Execute() {
+        bool _Execute() {
 
             //Set the wheels to their diagonal positions (at incremental 45*
             //angles found with radians converted into Nics). This works as
@@ -54,6 +64,8 @@ class AssumeRotationDegrees : public AutoStep {
             return false;
         }
 
+        void _Cleanup() {}
+
     private:
         SwerveTrain* m_zion;
         Limelight* m_limelight;
@@ -62,3 +74,5 @@ class AssumeRotationDegrees : public AutoStep {
         double m_initalAngle;
         double m_resultingAngle;
 };
+
+#endif

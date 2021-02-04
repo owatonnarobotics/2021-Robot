@@ -1,16 +1,21 @@
+#ifndef ASSUMEDISTANCE_H
+#define ASSUMEDISTANCE_H
+
+#include <string>
+
 #include "SwerveTrain.h"
 #include "RobotMap.h"
 
 class AssumeDistance : public AutoStep {
 
     public:
-        AssumeDistance(SwerveTrain &refZion, const double& distanceToAssume) {
+        AssumeDistance(SwerveTrain &refZion, const double& distanceToAssume) : AutoStep("AssumeDistance") {
 
             m_zion = &refZion;
             m_targetDistance = distanceToAssume;
         }
 
-        void Init() {
+        void _Init() {
 
             //At the first iteration, set the starting and goal values to
             //memory for comparison once operating (since we're translating
@@ -22,7 +27,7 @@ class AssumeDistance : public AutoStep {
             m_targetEncoderPosition = m_initialFrontRightDrivePosition + ((m_targetDistance / R_circumfrenceWheel) * R_kuhnsConstant);
         }
 
-        bool Execute() {
+        bool _Execute() {
 
             //If we're not in tolerance for meeting the goal value (since
             //going to a distance generates no oscillation, zero can be
@@ -44,7 +49,7 @@ class AssumeDistance : public AutoStep {
             
         }
 
-        void Cleanup() {}
+        void _Cleanup() {}
 
     private:
         SwerveTrain* m_zion;
@@ -52,3 +57,5 @@ class AssumeDistance : public AutoStep {
         double m_targetEncoderPosition;
         double m_targetDistance;
 };
+
+#endif
