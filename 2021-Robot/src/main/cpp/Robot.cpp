@@ -15,10 +15,12 @@
 #include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
+#include "Recorder.h"
 #include "auto/AutoStep.h"
 #include "auto/AutoSequence.h"
 #include "auto/steps/AssumeDirection.h"
 #include "auto/steps/AssumeDistance.h"
+#include "auto/steps/RunPrerecorded.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -28,11 +30,12 @@ Intake intake(R_CANIDMotorIntake);
 Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
+Recorder recorder;
 SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
 SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder);
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
 AutoSequence masterAuto;

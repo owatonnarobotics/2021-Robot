@@ -7,7 +7,7 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(frc::Joystick *controller, const bool useVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0, const bool precision = false) {
+void SwerveTrain::driveController(frc::Joystick *controller, const bool precision, const bool useVirtual, const int virtualX, const int virtualY, const int virtualZ) {
 
     double x, y, z;
     if (useVirtual) {
@@ -23,6 +23,15 @@ void SwerveTrain::driveController(frc::Joystick *controller, const bool useVirtu
         y = -controller->GetY();
         //Limit the Z axis by the cap, as turning can be violent
         z = controller->GetZ() * R_executionCapZion;
+    }
+
+    if (controller->GetRawButton(6)) {
+
+        m_recorder->Record(x, y, z);
+    }
+    else {
+
+        m_recorder->Publish();
     }
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of

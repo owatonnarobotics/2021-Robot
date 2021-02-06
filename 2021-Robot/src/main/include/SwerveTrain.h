@@ -99,17 +99,19 @@ Private Methods
 #include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
+#include "Recorder.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
             navX = &navXToSet;
+            m_recorder = &recorderToSet;
         }
 
         void setDriveSpeed(const double &driveSpeed = 0) {
@@ -188,7 +190,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::Joystick *controller, const bool isVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0, const bool precision = false);
+        void driveController(frc::Joystick *controller, const bool precision, const bool isVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0);
         void zeroController(frc::Joystick *controller);
 
     private:
@@ -270,6 +272,7 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
         NavX *navX;
+        Recorder* m_recorder;
 
         enum ZionDirections {
 
