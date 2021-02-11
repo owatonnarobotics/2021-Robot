@@ -7,27 +7,15 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(frc::Joystick *controller, const bool precision, const bool useVirtual, const int virtualX, const int virtualY, const int virtualZ) {
+void SwerveTrain::driveController(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
 
-    double x, y, z;
-    if (useVirtual) {
+    double x = -rawX;
+    double y = -rawY;
+    double z = rawZ * R_executionCapZion;
 
-        x = virtualX;
-        y = virtualY;
-        z = virtualZ;
-    }
-    else {
+    if (record) {
 
-        //TODO: Why does inverting certain things work?
-        x = -controller->GetX();
-        y = -controller->GetY();
-        //Limit the Z axis by the cap, as turning can be violent
-        z = controller->GetZ() * R_executionCapZion;
-    }
-
-    if (controller->GetRawButton(6)) {
-
-        m_recorder->Record(x, y, z);
+        m_recorder->Record(rawX, rawY, rawZ);
     }
     else {
 
@@ -42,7 +30,7 @@ void SwerveTrain::driveController(frc::Joystick *controller, const bool precisio
     optimizeControllerXYToZ(x, y, z);
 
     //If the controller is in the total deadzone (entirely still)...
-    if (getControllerInDeadzone(controller)) {
+    if (getControllerInDeadzone(x, y, z)) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and

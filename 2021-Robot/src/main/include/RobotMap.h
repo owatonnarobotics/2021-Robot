@@ -84,6 +84,10 @@ const double R_zionAutoToleranceAngle = 10;
 //This is how close to zero the Limelight's horizontal target offset can be
 //in order to be considered centered.
 const double R_zionAutoToleranceHorizontalOffset = .5;
+//This is the number of digits past the decimal place that will be stored when
+//being recorded.
+const int R_zionAutoJoystickRecorderPrecision = 5;
+const int R_zionAutoJoystickTotalDigits = R_zionAutoJoystickRecorderPrecision + 2;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.

@@ -59,6 +59,7 @@ void Robot::RobotInit() {
     m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::3Cell", "threeCell");
+    m_chooserAuto->AddOption("Chooser::Auto::Run-PreRecorded", "prerec");
     //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
@@ -66,6 +67,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
+    frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -74,6 +76,7 @@ void Robot::AutonomousInit() {
     //calibrated before the match. This persists for the match duration unless
     //overriden.
     zion.setZeroPosition();
+    navX.resetYaw();
     //Get which auto was selected to run in auto to test against.
     m_chooserAutoSelected = m_chooserAuto->GetSelected();
     
@@ -83,6 +86,10 @@ void Robot::AutonomousInit() {
         masterAuto.AddStep(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
         masterAuto.AddStep(new AssumeDistance(zion, 30));
     }
+    else if (m_chooserAutoSelected == "prerec") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion));
+    }
 
     masterAuto.Init();
 }
@@ -91,7 +98,10 @@ void Robot::AutonomousPeriodic() {
     //Lock the drive wheels before beginning for accuracy.
     zion.setDriveBrake(true);
     //Run the auto!
-    masterAuto.Execute();
+    if (masterAuto.Execute()) {
+
+        zion.assumeNearestZeroPosition();
+    }
 }
 void Robot::TeleopInit() {
 
@@ -113,7 +123,7 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne, playerOne->GetRawButton(12));
+    zion.driveController(playerOne->GetX(), playerOne->GetY(), playerOne->GetZ(), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
 
     //zion.setSwerveSpeed(0);
     //zion.setSwerveSpeed(0);

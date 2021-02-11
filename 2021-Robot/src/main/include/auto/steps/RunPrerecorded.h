@@ -5,79 +5,91 @@
 #include <string>
 #include <frc/SmartDashboard/SmartDashboard.h>
 
+#include "SwerveTrain.h"
+#include "RobotMap.h"
+
 class RunPrerecorded : public AutoStep {
 
-    public:
-        RunPrerecorded(SwerveTrain &refZion) : AutoStep("PreRecorded") {
+public:
+    RunPrerecorded(SwerveTrain& refZion) : AutoStep("PreRecorded") {
 
-            m_zion = &refZion;
+        m_zion = &refZion;
+    }
+
+    void _Init() {
+
+        std::string stringValues = frc::SmartDashboard::GetString("AutoStep::RunPrerecorded::Values", "") + "x";
+        bool done = false;
+        int pos = 0;
+        if (stringValues.length() >= R_zionAutoJoystickTotalDigits * 3) {
+
+            while (!done) {
+
+                if (stringValues.at(pos * (R_zionAutoJoystickTotalDigits * 3)) == 'x') {
+
+                    done = true;
+                }
+                else {
+
+                    ControllerState tempState;
+                    tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3), R_zionAutoJoystickTotalDigits));
+                    tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits, R_zionAutoJoystickTotalDigits));
+                    tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits * 2, R_zionAutoJoystickTotalDigits));
+                    m_values.push_back(tempState);
+                    pos++;
+                }
+            }
+            if (!m_values.empty()) {
+
+                m_currentValue = m_values.begin();
+                m_endValue = m_values.end();
+            }
         }
+    }
 
-        void _Init() {
+    bool _Execute() {
 
-            std::string stringValues = frc::SmartDashboard::GetString("AutoStep::RunPrerecorded::Values", "\0");
-            const int totalLength = stringValues.length() + 1;
-            m_virtualValues = new char[totalLength];
-            memcpy(m_virtualValues, stringValues.c_str(), sizeof(char) * totalLength);
-            m_currentChar = m_virtualValues;
-        }
-
-        bool _Execute() {
+        if (!m_values.empty()) {
 
             // If we are at the end of the file
-            if (*m_currentChar == '\0') {
+            if (m_currentValue == m_endValue) {
 
-                m_zion->setSwerveSpeed();
-                m_zion->setDriveSpeed();
+                m_zion->setSwerveSpeed(0);
+                m_zion->setDriveSpeed(0);
                 return true;
             }
             else {
 
-
-                double x = getNextDouble();
-                double y = getNextDouble();
-                double z = getNextDouble();
-
-                m_zion->driveController(nullptr, false, true, x, y, z);
+                double x = m_currentValue->x;
+                double y = m_currentValue->y;
+                double z = m_currentValue->z;
+                m_zion->driveController(x, y, z, false, false);
+                m_currentValue++;
                 return false;
             }
+        }
+        else {
+
+            m_zion->setSwerveSpeed(0);
+            m_zion->setDriveSpeed(0);
             return true;
         }
+    }
 
-        double getNextDouble() {
+    void _Cleanup() {}
 
-            const char* m_searchChar = m_currentChar;
-            int counter = 0;
-            bool searching = true;
-            while (searching) {
+    struct ControllerState {
 
-                if (*m_searchChar == '-' || *m_searchChar == '\0') {
+        double x;
+        double y;
+        double z;
+    };
 
-                    searching = false;
-                }
-                else {
-
-                    counter++;
-                    m_searchChar++;
-                }
-            }
-            char* stringDouble = new char[counter];
-            memcpy(stringDouble, m_currentChar, sizeof(char) * counter);
-            m_currentChar += counter + 1;
-            char* endPtr;
-            double toReturn = strtod(stringDouble, &endPtr);
-            return toReturn;
-        }
-
-        void _Cleanup() {
-
-            delete[] m_virtualValues;
-        }
-
-    private:
-        SwerveTrain* m_zion;
-        char* m_virtualValues;
-        const char* m_currentChar;
+private:
+    SwerveTrain* m_zion;
+    std::vector<ControllerState> m_values;
+    std::vector<ControllerState>::iterator m_currentValue;
+    std::vector<ControllerState>::iterator m_endValue;
 };
 
 #endif

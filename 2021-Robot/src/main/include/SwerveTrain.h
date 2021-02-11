@@ -190,7 +190,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::Joystick *controller, const bool precision, const bool isVirtual = false, const int virtualX = 0, const int virtualY = 0, const int virtualZ = 0);
+        void driveController(const double x, const double y, const double z, const bool precision, const bool record);
         void zeroController(frc::Joystick *controller);
 
     private:
@@ -218,11 +218,11 @@ class SwerveTrain {
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerInDeadzone(frc::Joystick *controller) {
+        bool getControllerInDeadzone(const double x, const double y, const double z) {
 
-            const double absX = abs(controller->GetX());
-            const double absY = abs(controller->GetY());
-            const double absZ = abs(controller->GetZ());
+            const double absX = abs(x);
+            const double absY = abs(y);
+            const double absZ = abs(z);
             const double zone = R_deadzoneController;
 
             if (absX < zone && absY < zone && absZ < zone) {
