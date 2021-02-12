@@ -11,7 +11,7 @@ void SwerveTrain::driveController(const double rawX, const double rawY, const do
 
     double x = -rawX;
     double y = -rawY;
-    double z = rawZ * R_executionCapZion;
+    double z = rawZ; //* R_executionCapZion;
 
     if (record) {
 

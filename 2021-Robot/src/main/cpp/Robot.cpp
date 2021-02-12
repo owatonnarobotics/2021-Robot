@@ -15,12 +15,12 @@
 #include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
-#include "Recorder.h"
 #include "auto/AutoStep.h"
 #include "auto/AutoSequence.h"
 #include "auto/steps/AssumeDirection.h"
 #include "auto/steps/AssumeDistance.h"
 #include "auto/steps/RunPrerecorded.h"
+#include "Recorder.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -58,8 +58,8 @@ void Robot::RobotInit() {
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->SetDefaultOption("Chooser::Auto::3Cell", "threeCell");
-    m_chooserAuto->AddOption("Chooser::Auto::Run-PreRecorded", "prerec");
+    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
+    m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
     //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
@@ -68,6 +68,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -88,7 +89,8 @@ void Robot::AutonomousInit() {
     }
     else if (m_chooserAutoSelected == "prerec") {
 
-        masterAuto.AddStep(new RunPrerecorded(zion));
+        //masterAuto.AddStep(new AssumeDistance(zion, 30));
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, R_zionAutoTestPath));
     }
 
     masterAuto.Init();
@@ -123,7 +125,7 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne->GetX(), playerOne->GetY(), playerOne->GetZ(), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
+    zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
 
     //zion.setSwerveSpeed(0);
     //zion.setSwerveSpeed(0);

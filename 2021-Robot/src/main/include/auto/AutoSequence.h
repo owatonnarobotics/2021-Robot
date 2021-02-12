@@ -15,8 +15,8 @@ class AutoSequence : public AutoStep {
             if (!m_steps.empty()) {
                 m_currentStep = m_steps.begin();
                 m_lastStep = std::prev(m_steps.end());
-                m_done = m_currentStep == m_lastStep;
-                if (!m_done) (*m_currentStep)->Init();
+                (*m_currentStep)->Init();
+                m_done = false;
             }
             else {
 

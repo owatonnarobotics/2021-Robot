@@ -172,6 +172,13 @@ class SwerveTrain {
             m_rearLeft->assumeSwerveNearestZeroPosition();
             m_rearRight->assumeSwerveNearestZeroPosition();
         }
+        bool assumeTurnAroundCenterPositions() {
+
+            return  m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
+                    m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
+                    m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
+                    m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+        }
 
         void setZionMotorsToVector(const VectorDouble &vectorToSet) {
 
@@ -181,6 +188,13 @@ class SwerveTrain {
             m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
         }
 
+        bool zionMotorsAreAtVector(const VectorDouble &vectorToTest) {
+
+            return m_frontRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_frontLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_rearLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_rearRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest));
+        }
 
         void publishSwervePositions() {
 

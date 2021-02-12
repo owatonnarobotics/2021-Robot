@@ -35,32 +35,30 @@ class AssumeRotationDegrees : public AutoStep {
             //angles found with radians converted into Nics). This works as
             //this section of the code also runs as a loop, and these functions
             //handle setting values down to zero once correct...
-            m_zion->m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
-            m_zion->m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
-            m_zion->m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
-            m_zion->m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+            if (m_zion->assumeTurnAroundCenterPositions()) {
 
-            //If we're not within tolerance for meeting the goal angle...
-            if (abs(m_resultingAngle - m_navX->getAngle()) > R_zionAutoToleranceAngle) {
+                //If we're not within tolerance for meeting the goal angle...
+                if (abs(m_resultingAngle - m_navX->getAngle()) > R_zionAutoToleranceAngle) {
 
-                //If rotation needs to be clockwise (goal is greater than init)
-                //set the turning speed to be positive, otherise, set it
-                //negative (due to the way the wheels align, these values are
-                //inverted)...
-                m_zion->setDriveSpeed(m_resultingAngle > m_initalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
+                    //If rotation needs to be clockwise (goal is greater than init)
+                    //set the turning speed to be positive, otherise, set it
+                    //negative (due to the way the wheels align, these values are
+                    //inverted)...
+                    m_zion->setDriveSpeed(m_resultingAngle > m_initalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
+                }
+                //If we were within tolerance that iteration...
+                else {
+
+                    //Stop moving, reset the wheels, clean up, and return true.
+                    m_zion->setDriveSpeed();
+                    m_zion->setSwerveSpeed();
+                    return true;
+                }
             }
-            //If we were within tolerance that iteration...
             else {
 
-                //Stop moving, reset the wheels, clean up, and return true.
                 m_zion->setDriveSpeed();
-                //Since this is a core auto function, it must be run as
-                //a loop, so do so and then continue with the rest of cleanup.
-                //TODO: why was this here?: while (!zionAssumeDirection(ZionDirections::kForward));
-                return true;
             }
-            //If we made it to here, we didn't succeed, so return false for
-            //another go at it.
             return false;
         }
 

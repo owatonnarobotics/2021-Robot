@@ -3,24 +3,38 @@
 
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include <string>
-#include <frc/SmartDashboard/SmartDashboard.h>
+#include <fstream>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Recorder {
 
     public:
 
-        Recorder() {}
+        Recorder() {
+
+            m_old = "";
+        }
 
         void Record(const double x, const double y, const double z) {
 
-            m_log << std::setprecision(R_zionAutoJoystickRecorderPrecision) << std::fixed << x << y << z; 
+            m_log << std::setprecision(R_zionAutoJoystickRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1; 
             SetStatus("Recording in progress...");
         }
 
         void Publish() {
 
-            SetStatus(m_log.str());
+            std::string newStr = m_log.str();
+            if (newStr != m_old) {
+                
+                m_old = newStr;
+                SetStatus(newStr);
+                std::ofstream usb;
+                usb.open("/u/data.txt");
+                usb << m_log.str();
+                usb.close();
+            }
         }
 
         void SetStatus(std::string status) {
@@ -30,6 +44,7 @@ class Recorder {
 
     private:
         std::stringstream m_log;
+        std::string m_old;
 };
 
 #endif
