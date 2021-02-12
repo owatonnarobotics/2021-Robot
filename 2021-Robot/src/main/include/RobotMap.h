@@ -106,4 +106,7 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
+
+const int R_pogPort = 4;
+const int R_pepelPort = 5;
 /*___End Global Robot Variable Settings___*/
