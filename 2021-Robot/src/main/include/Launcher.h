@@ -30,6 +30,7 @@ class Launcher {
 
             indexMotor = new rev::CANSparkMax(indexMotorCANID, rev::CANSparkMax::MotorType::kBrushed);
             launchMotorOne = new rev::CANSparkMax(launchMotorOneCANID, rev::CANSparkMax::MotorType::kBrushless);
+            launchMotorOneEncoder = new rev::CANEncoder(launchMotorOne->GetEncoder());
             launchMotorTwo = new rev::CANSparkMax(launchMotorTwoCANID, rev::CANSparkMax::MotorType::kBrushless);
         }
 
@@ -49,9 +50,21 @@ class Launcher {
             //as they are mounted on opposite sides.
             launchMotorTwo->Set(speedToSet);
         }
+        
+        void SetRPM(const double rpm) {
+
+            //TODO: THIS WILL NOT WORK. WRITE A PIECEWISE!
+            setLaunchSpeed(rpm * 0.420 + 0.69 * 0.666 / 1738);
+        }
+
+        double GetRPM() {
+
+            return launchMotorOneEncoder->GetVelocity();
+        }
 
     private:
         rev::CANSparkMax *indexMotor;
         rev::CANSparkMax *launchMotorOne;
         rev::CANSparkMax *launchMotorTwo;
+        rev::CANEncoder *launchMotorOneEncoder;
 };

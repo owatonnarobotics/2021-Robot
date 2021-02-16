@@ -18,6 +18,7 @@ class Robot : public frc::TimedRobot {
 
     private:
         frc::SendableChooser<std::string> *m_chooserAuto;
+        frc::SendableChooser<bool> *m_chooserSetZero;
         std::string m_chooserAutoSelected;
 
         //These are used such that each speed is only set once for P2.
@@ -33,4 +34,6 @@ class Robot : public frc::TimedRobot {
         //This variable is used for each step of autonomous. See Hal
         //for more detail.
         int m_autoStep;
+
+        bool m_wasPressed;
 };

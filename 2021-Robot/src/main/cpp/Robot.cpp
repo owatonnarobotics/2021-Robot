@@ -4,6 +4,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
+#include <frc/DriverStation.h>
+#include <fstream>
 
 #include "Climber.h"
 #include "Hal.h"
@@ -47,6 +49,8 @@ void Robot::RobotInit() {
 
     m_autoStep = 0;
 
+    m_wasPressed = 0;
+
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
@@ -54,9 +58,13 @@ void Robot::RobotInit() {
     //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
+    m_chooserSetZero = new frc::SendableChooser<bool>;
+    m_chooserSetZero->AddOption("Yes", true);
+    m_chooserSetZero->SetDefaultOption("No", false);
+
     frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
+    //frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
 }
 void Robot::RobotPeriodic() {}
@@ -126,10 +134,32 @@ void Robot::TeleopInit() {
     //the drive train, and go to the pre-calibrated zero position set up at the
     //beginning of auto to begin the match.
     zion.setSwerveBrake(true);
-    zion.setDriveBrake(false);
+    zion.setDriveBrake(true);
     zion.assumeNearestZeroPosition();
 }
 void Robot::TeleopPeriodic() {
+
+    frc::SmartDashboard::PutNumber("TARGET AREA", limelight.getTargetArea());
+    frc::SmartDashboard::PutNumber("LAUNCHER RPM", launcher.GetRPM());
+
+    if (playerOne->GetRawButton(1)) {
+    
+        if(!m_wasPressed) {
+
+            m_wasPressed = true;
+            std::ofstream csv;
+            csv.open("/u/distance-data.csv", std::ios_base::app | std::ios_base::out);
+            double area = limelight.getTargetArea();
+            double rpm = launcher.GetRPM();
+            csv << area << "," << rpm << "\n";
+            csv.close();
+            frc::DriverStation::ReportError("Logged data to distance data csv file. Area was " + std::to_string(area) + " and rpm was " + std::to_string(rpm));
+        }
+    }
+    else {
+
+        m_wasPressed = false;
+    }
 
     if (playerOne->GetRawButtonPressed(3)) {
 
@@ -139,7 +169,9 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne, playerOne->GetRawButton(12));
+    //zion.driveController(playerOne, playerOne->GetRawButton(12));
+    zion.setDriveSpeed(0);
+    zion.setDriveSpeed(0);
 
 
     //The second controller works in control layers on top of the basic
@@ -208,13 +240,13 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetXButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
+            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far", 0);//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
         }
-        if (playerTwo->GetBButton()) {
+        /*if (playerTwo->GetBButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
-        }
-        if (!playerTwo->GetXButton() && !playerTwo->GetBButton()) {
+            m_speedLauncherLaunch = 0.4;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
+        }*/
+        if (!playerTwo->GetXButton()/* && !playerTwo->GetBButton()*/) {
 
             m_speedLauncherLaunch = 0;
         }
@@ -237,11 +269,11 @@ void Robot::DisabledPeriodic() {
     //held, unlock the swerves for zeroing. Once released, lock them again. The
     //switch is inverted by default, so no inversion is required. This is in
     //disabled on the off-chance that the switch got bumped during match play.
-    zion.setSwerveBrake(switchSwerveUnlock.Get());
+    zion.setSwerveBrake(false/*switchSwerveUnlock.Get()*/);
     //Whenever Zion is on, allow control of the Limelight from P2. This permits
     //using it for manual alignment at any time, before or after the match.
-    limelight.setLime(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
-    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kRightHand));
+    limelight.setLime(true);//playerTwo->GetBumper(frc::GenericHID::kLeftHand));
+    limelight.setProcessing(true);//playerTwo->GetBumper(frc::GenericHID::kRightHand));
 }
 
 #ifndef RUNNING_FRC_TESTS

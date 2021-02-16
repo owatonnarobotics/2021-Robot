@@ -70,8 +70,8 @@ const double R_executionCapIntake = .75;
 const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed, for both distances and idle.
 const double R_launcherDefaultSpeedLaunch = .2;
-const double R_launcherDefaultSpeedLaunchClose = .7425;
-const double R_launcherDefaultSpeedLaunchFar = .76378;
+const double R_launcherDefaultSpeedLaunchClose = 0;//.7425;
+const double R_launcherDefaultSpeedLaunchFar = 0;//.76378;
 
 //This is the speed for automatic lateral movement in autonomous.
 const double R_zionAutoMovementSpeedLateral = .35;
@@ -106,4 +106,6 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
+
+const int R_launcherSetRPMTolerance = 15;
 /*___End Global Robot Variable Settings___*/
