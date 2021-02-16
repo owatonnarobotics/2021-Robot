@@ -68,6 +68,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
+    frc::SmartDashboard::PutString("Recorder::output_file_string", "");
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
@@ -90,7 +91,7 @@ void Robot::AutonomousInit() {
     else if (m_chooserAutoSelected == "prerec") {
 
         //masterAuto.AddStep(new AssumeDistance(zion, 30));
-        masterAuto.AddStep(new RunPrerecorded(zion, limelight, R_zionAutoTestPath));
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "testingg"));
     }
 
     masterAuto.Init();
@@ -110,7 +111,7 @@ void Robot::TeleopInit() {
     //To clean up adter auto, confirm the swerves are locked and unlock
     //the drive train, and go to the pre-calibrated zero position set up at the
     //beginning of auto to begin the match.
-    zion.setZeroPosition();
+    //zion.setZeroPosition();
     zion.setSwerveBrake(true);
     zion.setDriveBrake(false);
     zion.assumeNearestZeroPosition();

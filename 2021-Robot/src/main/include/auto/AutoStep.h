@@ -2,6 +2,7 @@
 #define AUTOSTEP_H
 
 #include <string>
+#include <frc/DriverStation.h>
 
 class AutoStep {
     
@@ -27,6 +28,11 @@ class AutoStep {
 
             //std::cout << m_name << " cleanup" << std::endl;
             _Cleanup();
+        }
+
+        void Log(std::string message) {
+
+            frc::DriverStation::ReportError(message);
         }
 
     private:

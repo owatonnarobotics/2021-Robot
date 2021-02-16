@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <frc/SmartDashboard/SmartDashboard.h>
+#include <fstream>
+#include <sstream>
+#include <frc/DriverStation.h>
 
 #include "SwerveTrain.h"
 #include "RobotMap.h"
@@ -12,43 +15,66 @@
 class RunPrerecorded : public AutoStep {
 
 public:
-    RunPrerecorded(SwerveTrain& refZion, Limelight &limeToSet, std::string values) : AutoStep("PreRecorded") {
+    RunPrerecorded(SwerveTrain& refZion, Limelight &limeToSet, std::string pathToValues) : AutoStep("PreRecorded") {
 
         m_zion = &refZion;
-        m_strValues = values;
+        m_path = pathToValues;
         m_limelight = &limeToSet;
     }
 
     void _Init() {
 
-        std::string stringValues = m_strValues;//frc::SmartDashboard::GetString("AutoStep::RunPrerecorded::Values", "") + "x";
-        bool done = false;
-        int pos = 0;
-        if (stringValues.length() >= R_zionAutoJoystickTotalDigits * 3) {
+        std::ifstream valuesFile("/u/" + m_path);
+        if (valuesFile.is_open()) {
+            
+            std::ostringstream oss;
+            oss << valuesFile.rdbuf();
+            std::string stringValues = oss.str();
+            if (stringValues.length() >= R_zionAutoJoystickTotalDigits * 3) {
+                
+                if (stringValues.at(stringValues.length() - 1) == 'x') {
 
-            while (!done) {
+                    bool done = false;
+                    int pos = 0;    
+                    while (!done) {
 
-                if (stringValues.at(pos * (R_zionAutoJoystickTotalDigits * 3)) == 'x') {
+                        if (stringValues.at(pos * (R_zionAutoJoystickTotalDigits * 3)) == 'x') {
 
-                    done = true;
+                            done = true;
+                        }
+                        else {
+
+                            ControllerState tempState;
+                            tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3), R_zionAutoJoystickTotalDigits)) - 1;
+                            tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits, R_zionAutoJoystickTotalDigits)) - 1;
+                            tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits * 2, R_zionAutoJoystickTotalDigits)) - 1;
+                            m_values.push_back(tempState);
+                            pos++;
+                        }
+                    }
+                    if (!m_values.empty()) {
+
+                        m_currentValue = m_values.begin();
+                        m_endValue = m_values.end();
+                    }
+                    else {
+
+                        _Log("File parsed was empty...?");
+                    }
                 }
                 else {
 
-                    ControllerState tempState;
-                    tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3), R_zionAutoJoystickTotalDigits)) - 1;
-                    tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits, R_zionAutoJoystickTotalDigits)) - 1;
-                    tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoJoystickTotalDigits * 3) + R_zionAutoJoystickTotalDigits * 2, R_zionAutoJoystickTotalDigits)) - 1;
-                    m_values.push_back(tempState);
-                    pos++;
+                    _Log("Could not find EOF in recorded values");
                 }
             }
-            if (!m_values.empty()) {
+            else {
 
-                m_currentValue = m_values.begin();
-                m_endValue = m_values.end();
-                //wpi::outs() << "Length of values: " << m_values.size() << "\n";
-                //wpi::outs() << "This routine should take " << m_values.size() / 20.0 << " seconds" << "\n";
+                _Log("Not enough data");                
             }
+        }
+        else {
+
+            _Log("Unable to open values file");
         }
     }
 
@@ -61,7 +87,7 @@ public:
 
                 m_zion->setSwerveSpeed(0);
                 m_zion->setDriveSpeed(0);
-                m_limelight->setLime(true);
+                _Log("Finished executing recording");
                 return true;
             }
             else {
@@ -78,11 +104,17 @@ public:
 
             m_zion->setSwerveSpeed(0);
             m_zion->setDriveSpeed(0);
+            _Log("Finished executing recording; there was no data");
             return true;
         }
     }
 
     void _Cleanup() {}
+
+    void _Log(std::string message) {
+
+        Log("[" + m_path + "] " + message);
+    }
 
     struct ControllerState {
 
@@ -96,7 +128,7 @@ private:
     std::vector<ControllerState> m_values;
     std::vector<ControllerState>::iterator m_currentValue;
     std::vector<ControllerState>::iterator m_endValue;
-    std::string m_strValues;
+    std::string m_path;
     Limelight* m_limelight;
 };
 
