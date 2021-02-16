@@ -6,6 +6,7 @@
 #include <frc/XboxController.h>
 #include <frc/DriverStation.h>
 #include <fstream>
+#include <math.h>
 
 #include "Climber.h"
 #include "Hal.h"
@@ -23,7 +24,7 @@ frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
 Intake intake(R_CANIDMotorIntake);
-Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo);
+Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_pogPort, R_pepelPort);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
 SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
@@ -46,6 +47,7 @@ void Robot::RobotInit() {
     m_speedIntake           = 0;
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
+    m_servoSpeed            = 0;
 
     m_autoStep = 0;
 
@@ -66,6 +68,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     //frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
+    frc::SmartDashboard::PutNumber("SERVO POSITION", 0);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -151,9 +154,11 @@ void Robot::TeleopPeriodic() {
             csv.open("/u/distance-data.csv", std::ios_base::app | std::ios_base::out);
             double area = limelight.getTargetArea();
             double rpm = launcher.GetRPM();
-            csv << area << "," << rpm << "\n";
+            int servoPos = frc::SmartDashboard::GetNumber("SERVO POSITION", 0);
+            double speed = launcher.GetSpeed();
+            csv << area << "," << rpm << "," << servoPos << "," << speed << "\n";
             csv.close();
-            frc::DriverStation::ReportError("Logged data to distance data csv file. Area was " + std::to_string(area) + " and rpm was " + std::to_string(rpm));
+            frc::DriverStation::ReportError("Logged data to distance data csv file. Area was " + std::to_string(area) + ", rpm was " + std::to_string(rpm) + ", servo pos was " + std::to_string(servoPos) + ", and speed was " + std::to_string(speed));
         }
     }
     else {
@@ -252,6 +257,12 @@ void Robot::TeleopPeriodic() {
         }
     }
 
+    double x = playerTwo->GetY(frc::GenericHID::JoystickHand::kLeftHand);
+    x = abs(x) < 0.1 ? 0 : x;
+    m_servoSpeed += x * 15 / 20.0;//frc::SmartDashboard::GetNumber("SERVO POSITION", 0);
+    m_servoSpeed = (m_servoSpeed < 0 || m_servoSpeed > 180) ? (m_servoSpeed < 0 ? 0 : 180) : m_servoSpeed;
+    frc::SmartDashboard::PutNumber("SERVO POSITION", floor(m_servoSpeed));
+
     //Once all layers have been evaluated, write out all of their values.
     //Doing this only once prevents weird bugs in which multiple different
     //values get set at different times in the loop.
@@ -262,6 +273,7 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
+    launcher.setServo(Launcher::kSetAngle, floor(m_servoSpeed));
 }
 void Robot::DisabledPeriodic() {
 
