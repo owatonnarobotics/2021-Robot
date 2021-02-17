@@ -30,8 +30,8 @@ class Recorder {
                 
                 m_old = newStr;
                 SetStatus(newStr);
-                std::ofstream usb;
-                usb.open("/u/" + frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown"), std::ios::trunc);
+                std::fstream usb;
+                usb.open("/u/" + frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown"), std::ios::out | std::ios::trunc);
                 usb << m_log.str() << "x";
                 usb.close();
             }

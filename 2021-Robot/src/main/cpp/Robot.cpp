@@ -113,8 +113,7 @@ void Robot::TeleopInit() {
     //beginning of auto to begin the match.
     //zion.setZeroPosition();
     zion.setSwerveBrake(true);
-    zion.setDriveBrake(false);
-    zion.assumeNearestZeroPosition();
+    zion.setDriveBrake(true);
 }
 void Robot::TeleopPeriodic() {
 

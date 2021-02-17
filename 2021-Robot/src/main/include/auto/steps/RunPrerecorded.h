@@ -35,7 +35,7 @@ public:
                 if (stringValues.at(stringValues.length() - 1) == 'x') {
 
                     bool done = false;
-                    int pos = 0;    
+                    int pos = 0;
                     while (!done) {
 
                         if (stringValues.at(pos * (R_zionAutoJoystickTotalDigits * 3)) == 'x') {
@@ -55,7 +55,7 @@ public:
                     if (!m_values.empty()) {
 
                         m_currentValue = m_values.begin();
-                        m_endValue = m_values.end();
+                        m_endValue = std::prev(m_values.end());
                     }
                     else {
 

@@ -42,8 +42,8 @@ void SwerveTrain::driveController(const double rawX, const double rawY, const do
         this behavior to occur...
         */
         setDriveSpeed(0);
-        if (precision) setSwerveSpeed(0);
-        else assumeNearestZeroPosition();
+        setSwerveSpeed(0);
+        //else assumeNearestZeroPosition();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its
