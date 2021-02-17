@@ -13,7 +13,7 @@ void SwerveTrain::driveController(frc::Joystick *controller, bool precision = fa
     double x = -controller->GetX();
     double y = -controller->GetY();
     //Limit the Z axis by the cap, as turning can be violent
-    double z = controller->GetZ() * R_executionCapZion;
+    double z = controller->GetZ();
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.

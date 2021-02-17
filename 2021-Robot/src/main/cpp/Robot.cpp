@@ -52,6 +52,8 @@ void Robot::RobotInit() {
     m_autoStep = 0;
 
     m_wasPressed = 0;
+    m_leftBumperWasPressed = false;
+    m_rightBumperWasPressed = false;
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
@@ -170,13 +172,13 @@ void Robot::TeleopPeriodic() {
 
         zion.setZeroPosition();
     }
-    if (playerOne->GetRawButton(1)) {
+    if (playerOne->GetRawButton(5)) {
 
         navX.resetYaw();
     }
-    //zion.driveController(playerOne, playerOne->GetRawButton(12));
-    zion.setDriveSpeed(0);
-    zion.setDriveSpeed(0);
+    zion.driveController(playerOne, playerOne->GetRawButton(12));
+    //zion.setDriveSpeed(0);
+    //zion.setDriveSpeed(0);
 
 
     //The second controller works in control layers on top of the basic
@@ -257,11 +259,42 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    double x = playerTwo->GetY(frc::GenericHID::JoystickHand::kLeftHand);
-    x = abs(x) < 0.1 ? 0 : x;
-    m_servoSpeed += x * 15 / 20.0;//frc::SmartDashboard::GetNumber("SERVO POSITION", 0);
+    if (playerTwo->GetBumper(frc::GenericHID::JoystickHand::kLeftHand)) {
+
+        if (!m_leftBumperWasPressed) {
+
+            m_leftBumperWasPressed = true;
+            m_servoSpeed += 1;
+        }
+    }
+    else {
+
+        m_leftBumperWasPressed = false;
+
+        if (playerTwo->GetBumper(frc::GenericHID::JoystickHand::kRightHand)) {
+
+            if (!m_rightBumperWasPressed) {
+
+                m_rightBumperWasPressed = true;
+                m_servoSpeed -= 1;
+            }
+        }
+        else {
+
+            m_rightBumperWasPressed = false;
+
+            double x = playerTwo->GetY(frc::GenericHID::JoystickHand::kLeftHand);
+            x = abs(x) < 0.1 ? 0 : x;
+            m_servoSpeed += x * 15 / 20.0;//frc::SmartDashboard::GetNumber("SERVO POSITION", 0);
+        }
+    }
+
+    /*double x = limelight.getTargetArea();
+    m_servoSpeed = -812.644 * pow(x, 6) + 7108.25 * pow(x, 5) - 24539.6 * pow(x, 4) + 41879.3 * pow(x, 3) - 35627.7 * pow(x, 2) + 12700.6 * x -679.787;
+    frc::SmartDashboard::PutNumber("RAW SERVO POSITION", m_servoSpeed);*/
     m_servoSpeed = (m_servoSpeed < 0 || m_servoSpeed > 180) ? (m_servoSpeed < 0 ? 0 : 180) : m_servoSpeed;
-    frc::SmartDashboard::PutNumber("SERVO POSITION", floor(m_servoSpeed));
+
+    frc::SmartDashboard::PutNumber("SERVO POSITION", round(m_servoSpeed));
 
     //Once all layers have been evaluated, write out all of their values.
     //Doing this only once prevents weird bugs in which multiple different
@@ -273,7 +306,7 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
-    launcher.setServo(Launcher::kSetAngle, floor(m_servoSpeed));
+    launcher.setServo(Launcher::kSetAngle, round(m_servoSpeed));
 }
 void Robot::DisabledPeriodic() {
 

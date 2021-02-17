@@ -37,4 +37,6 @@ class Robot : public frc::TimedRobot {
         int m_autoStep;
 
         bool m_wasPressed;
+        bool m_rightBumperWasPressed;
+        bool m_leftBumperWasPressed;
 };
