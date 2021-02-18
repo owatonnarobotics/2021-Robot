@@ -21,7 +21,7 @@ frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
 Intake intake(R_CANIDMotorIntake);
-Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_pogPort, R_pepelPort);
+Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_PWMPortRightServo, R_PWMPortLeftServo);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
 SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
@@ -44,7 +44,7 @@ void Robot::RobotInit() {
     m_speedIntake           = 0;
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
-    m_servoSpeed            = 0.5;
+    m_servoPosition         = 0;
 
     m_autoStep = 0;
 
@@ -221,11 +221,11 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetBumperPressed(frc::GenericHID::kLeftHand)) {
 
-            m_servoSpeed = m_servoSpeed - 0.25;
+            m_servoPosition = m_servoPosition - 0.25;
         }
         else if (playerTwo->GetBumperPressed(frc::GenericHID::kRightHand)) {
            
-            m_servoSpeed = m_servoSpeed + 0.25;
+            m_servoPosition = m_servoPosition + 0.25;
         }
     }
 
@@ -239,7 +239,7 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
-    launcher.setServo(Launcher::kSetSpeed, m_servoSpeed);
+    launcher.setServo(Launcher::kSetFullRange, m_servoPosition);
 }
 void Robot::DisabledPeriodic() {
 

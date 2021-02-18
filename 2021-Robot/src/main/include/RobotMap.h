@@ -10,6 +10,8 @@ const int R_PWMPortClimberMotorClimb     = 0;
 const int R_PWMPortClimberServoLock      = 1;
 const int R_PWMPortClimberMotorWheel     = 2;
 const int R_PWMPortClimberMotorTranslate = 3;
+const int R_PWMPortRightServo            = 4;
+const int R_PWMPortLeftServo             = 5;
 /*___End RoboRIO PWM Pin Declarations___*/
 
 /*_____RoboRIO DIO Pin Declarations_____*/
@@ -106,7 +108,4 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
-
-const int R_pogPort = 4;
-const int R_pepelPort = 5;
 /*___End Global Robot Variable Settings___*/

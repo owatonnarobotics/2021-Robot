@@ -27,13 +27,13 @@ Public Methods
 class Launcher {
 
     public:
-        Launcher(const int &indexMotorCANID, const int &launchMotorOneCANID, const int &launchMotorTwoCANID, const int &pogPort, const int &pepelPort) {
+        Launcher(const int &indexMotorCANID, const int &launchMotorOneCANID, const int &launchMotorTwoCANID, const int &rightServoPort, const int &leftServoPort) {
 
             indexMotor = new rev::CANSparkMax(indexMotorCANID, rev::CANSparkMax::MotorType::kBrushed);
             launchMotorOne = new rev::CANSparkMax(launchMotorOneCANID, rev::CANSparkMax::MotorType::kBrushless);
             launchMotorTwo = new rev::CANSparkMax(launchMotorTwoCANID, rev::CANSparkMax::MotorType::kBrushless);
-            pogServo = new frc::Servo(pogPort);
-            pepelServo = new frc::Servo(pepelPort);
+            rightServo = new frc::Servo(rightServoPort);
+            leftServo = new frc::Servo(leftServoPort);
         }
 
         void setIndexSpeed(const double &speedToSet = 0) {
@@ -56,26 +56,25 @@ class Launcher {
         }
 
         enum SetMode {
-        kSetSpeed,
-        kSetAngle
-    };
+            kSetFullRange,
+            kSetAngle
+        };
 
         // FYI the speed is set 0 as max backwards speed, 90 is full stop, 180 is full forwards speed. Angle is set in degrees.
     
         void setServo (SetMode mode, double toBeSet) {
 
-             if (mode == SetMode::kSetSpeed) {
+             if (mode == SetMode::kSetFullRange) {
 
-                 pogServo->Set(1 - toBeSet);
-                 pepelServo->Set(toBeSet);
+                 rightServo->Set(1 - toBeSet);
+                 leftServo->Set(toBeSet);
              }
              if (mode == SetMode::kSetAngle) {
 
-                pogServo->SetAngle(1 - toBeSet);
-                pepelServo->SetAngle(toBeSet);
+                rightServo->SetAngle(180 - toBeSet);
+                leftServo->SetAngle(toBeSet);
 
              }
-
         }
 
 
@@ -83,6 +82,6 @@ class Launcher {
         rev::CANSparkMax *indexMotor;
         rev::CANSparkMax *launchMotorOne;
         rev::CANSparkMax *launchMotorTwo;
-        frc::Servo *pogServo; 
-        frc::Servo *pepelServo;
+        frc::Servo *rightServo;
+        frc::Servo *leftServo; 
 };
