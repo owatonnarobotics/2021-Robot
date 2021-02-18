@@ -99,17 +99,19 @@ Private Methods
 #include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
+#include "Recorder.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
             navX = &navXToSet;
+            m_recorder = &recorderToSet;
         }
 
         void setDriveSpeed(const double &driveSpeed = 0) {
@@ -170,6 +172,29 @@ class SwerveTrain {
             m_rearLeft->assumeSwerveNearestZeroPosition();
             m_rearRight->assumeSwerveNearestZeroPosition();
         }
+        bool assumeTurnAroundCenterPositions() {
+
+            return  m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
+                    m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
+                    m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
+                    m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+        }
+
+        void setZionMotorsToVector(const VectorDouble &vectorToSet) {
+
+            m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+        }
+
+        bool zionMotorsAreAtVector(const VectorDouble &vectorToTest) {
+
+            return m_frontRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_frontLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_rearLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+                   m_rearRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest));
+        }
 
         void publishSwervePositions() {
 
@@ -179,7 +204,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::Joystick *controller, bool precision);
+        void driveController(const double x, const double y, const double z, const bool precision, const bool record);
         void zeroController(frc::Joystick *controller);
 
     private:
@@ -207,11 +232,11 @@ class SwerveTrain {
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerInDeadzone(frc::Joystick *controller) {
+        bool getControllerInDeadzone(const double x, const double y, const double z) {
 
-            const double absX = abs(controller->GetX());
-            const double absY = abs(controller->GetY());
-            const double absZ = abs(controller->GetZ());
+            const double absX = abs(x);
+            const double absY = abs(y);
+            const double absZ = abs(z);
             const double zone = R_deadzoneController;
 
             if (absX < zone && absY < zone && absZ < zone) {
@@ -261,4 +286,10 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
         NavX *navX;
+        Recorder* m_recorder;
+
+        enum ZionDirections {
+
+            kForward, kRight, kBackward, kLeft
+        };
 };

@@ -7,13 +7,20 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(frc::Joystick *controller, bool precision = false) {
+void SwerveTrain::driveController(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
 
-    //TODO: Why does inverting certain things work?
-    double x = -controller->GetX();
-    double y = -controller->GetY();
-    //Limit the Z axis by the cap, as turning can be violent
-    double z = controller->GetZ() * R_executionCapZion;
+    double x = -rawX;
+    double y = -rawY;
+    double z = rawZ; //* R_executionCapZion;
+
+    if (record) {
+
+        m_recorder->Record(rawX, rawY, rawZ);
+    }
+    else {
+
+        m_recorder->Publish();
+    }
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.
@@ -23,7 +30,7 @@ void SwerveTrain::driveController(frc::Joystick *controller, bool precision = fa
     optimizeControllerXYToZ(x, y, z);
 
     //If the controller is in the total deadzone (entirely still)...
-    if (getControllerInDeadzone(controller)) {
+    if (getControllerInDeadzone(x, y, z)) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and
@@ -35,8 +42,8 @@ void SwerveTrain::driveController(frc::Joystick *controller, bool precision = fa
         this behavior to occur...
         */
         setDriveSpeed(0);
-        if (precision) setSwerveSpeed(0);
-        else assumeNearestZeroPosition();
+        setSwerveSpeed(0);
+        //else assumeNearestZeroPosition();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its

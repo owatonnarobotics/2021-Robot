@@ -39,15 +39,15 @@ class NavX {
 
             if (connectionType == kUSB) {
 
-                navX = new AHRS(SPI::kOnboardCS0);
+                navX = new AHRS(frc::SPI::kOnboardCS0);
             }
             else if (connectionType == kMXP) {
 
-                navX = new AHRS(SPI::kMXP);
+                navX = new AHRS(frc::SPI::kMXP);
             }
             else {
 
-                navX = new AHRS(SPI::kMXP);
+                navX = new AHRS(frc::SPI::kMXP);
             }
         }
 

@@ -2,15 +2,16 @@
 
 #include "SwerveModule.h"
 
-void SwerveModule::assumeSwervePosition(const double &positionToAssume) {
+bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
 
     double currentPosition = getSwervePositionSingleRotation();
 
     //If the current position is close enough to where we want to go (within one tolerance value)...
-    if (abs(positionToAssume - currentPosition) < R_swerveTrainAssumePositionTolerance) {
+    if (isAtPositionWithinTolerance(positionToAssume)) {
 
         //Stop rotating the swerve motor and skip checking anything else...
         m_swerveMotor->Set(0);
+        return true;
     }
     //If the position to assume is greater than half a revolution in the clockwise direction...
     else if (abs(positionToAssume - currentPosition) > R_nicsConstant / 2) {
@@ -33,6 +34,7 @@ void SwerveModule::assumeSwervePosition(const double &positionToAssume) {
         //Otherwise, perform a normal between two points rotation with a Nic's Constant value.
         m_swerveMotor->Set(calculateAssumePositionSpeed(positionToAssume - currentPosition));
     }
+    return false;
 }
 
 double SwerveModule::calculateAssumePositionSpeed(const double &howFarRemainingInTravel) {

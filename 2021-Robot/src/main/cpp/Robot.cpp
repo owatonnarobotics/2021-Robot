@@ -6,7 +6,6 @@
 #include <frc/XboxController.h>
 
 #include "Climber.h"
-#include "Hal.h"
 #include "Intake.h"
 #include "Launcher.h"
 #include "Limelight.h"
@@ -15,6 +14,12 @@
 #include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
+#include "auto/AutoStep.h"
+#include "auto/AutoSequence.h"
+#include "auto/steps/AssumeDirection.h"
+#include "auto/steps/AssumeDistance.h"
+#include "auto/steps/RunPrerecorded.h"
+#include "Recorder.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -24,13 +29,13 @@ Intake intake(R_CANIDMotorIntake);
 Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
+Recorder recorder;
 SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
 SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
-
-Hal Hal9000(intake, launcher, limelight, navX, zion);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder);
+AutoSequence masterAuto;
 
 void Robot::RobotInit() {
 
@@ -48,16 +53,16 @@ void Robot::RobotInit() {
     m_autoStep = 0;
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
-    m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->SetDefaultOption("Chooser::Auto::3Cell", "threeCell");
-    //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
+    m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
-    frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
+    frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
+    frc::SmartDashboard::PutString("Recorder::output_file_string", "");
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -66,58 +71,32 @@ void Robot::AutonomousInit() {
     //calibrated before the match. This persists for the match duration unless
     //overriden.
     zion.setZeroPosition();
+    navX.resetYaw();
     //Get which auto was selected to run in auto to test against.
     m_chooserAutoSelected = m_chooserAuto->GetSelected();
+    
+    //If-We-Gotta-Do-It simply drives off the line.
+    if (m_chooserAutoSelected == "dotl") {
+
+        masterAuto.AddStep(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 30));
+    }
+    else if (m_chooserAutoSelected == "prerec") {
+
+        //masterAuto.AddStep(new AssumeDistance(zion, 30));
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "testingg"));
+    }
+
+    masterAuto.Init();
 }
 void Robot::AutonomousPeriodic() {
 
     //Lock the drive wheels before beginning for accuracy.
     zion.setDriveBrake(true);
+    //Run the auto!
+    if (masterAuto.Execute()) {
 
-    //Run whichever auto we selected, setting the string to garbage
-    //once it is complete so that it only runs once. This way, only one loop
-    //has to be controlled. See Hal.h for examples of how complex autonomous
-    //control is accomplished with flow-of-control.
-    //Do-Nothing does nothing, default.
-    if (m_chooserAutoSelected == "doNothing") {
-
-        m_chooserAutoSelected = "done";
-    }
-    //If-We-Gotta-Do-It simply drives off the line.
-    if (m_chooserAutoSelected == "dotl") {
-
-        if (m_autoStep == 0 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
-
-            m_autoStep = 1;
-        }
-        if (m_autoStep == 1 && Hal9000.zionAssumeDistance(30)) {
-
-            m_chooserAutoSelected = "done";
-        }
-    }
-    //Three-Cell unloads three cells and drives off the line.
-    if (m_chooserAutoSelected == "threeCell") {
-
-        //Spin up launcher, feed it cells, turn it off, and drive off the line.
-        if (m_autoStep == 0) {
-
-            Wait(frc::SmartDashboard::GetNumber("Field::Auto::3Cell-Delay", 0));
-            launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunchClose);
-            Wait(1);
-            launcher.setIndexSpeed(R_launcherDefaultSpeedIndex);
-            Wait(5);
-            launcher.setLaunchSpeed(0);
-            launcher.setIndexSpeed(0);
-            m_autoStep = 1;
-        }
-        if (m_autoStep == 1 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
-
-            m_autoStep = 2;
-        }
-        if (m_autoStep == 2 && Hal9000.zionAssumeDistance(30)) {
-
-            m_chooserAutoSelected = "done";
-        }
+        zion.assumeNearestZeroPosition();
     }
 }
 void Robot::TeleopInit() {
@@ -125,9 +104,9 @@ void Robot::TeleopInit() {
     //To clean up adter auto, confirm the swerves are locked and unlock
     //the drive train, and go to the pre-calibrated zero position set up at the
     //beginning of auto to begin the match.
+    //zion.setZeroPosition();
     zion.setSwerveBrake(true);
-    zion.setDriveBrake(false);
-    zion.assumeNearestZeroPosition();
+    zion.setDriveBrake(true);
 }
 void Robot::TeleopPeriodic() {
 
@@ -139,7 +118,7 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne, playerOne->GetRawButton(12));
+    zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
 
 
     //The second controller works in control layers on top of the basic
@@ -208,11 +187,11 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetXButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
+            m_speedLauncherLaunch = 0.65;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
         }
         if (playerTwo->GetBButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
+            m_speedLauncherLaunch = 0.4;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
         }
         if (!playerTwo->GetXButton() && !playerTwo->GetBButton()) {
 

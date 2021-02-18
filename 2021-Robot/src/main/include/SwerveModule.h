@@ -88,7 +88,6 @@ Private Methods
 #include "rev/CANSparkMax.h"
 
 #include "RobotMap.h"
-#include "VectorDouble.h"
 
 class SwerveModule {
 
@@ -200,7 +199,7 @@ class SwerveModule {
             return (R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.);
         }
 
-        void assumeSwervePosition(const double &positionToAssume);
+        bool assumeSwervePosition(const double &positionToAssume);
         void assumeSwerveZeroPosition() {
 
             assumeSwervePosition(m_swerveZeroPosition);
@@ -208,6 +207,12 @@ class SwerveModule {
         void assumeSwerveNearestZeroPosition() {
 
             assumeSwervePosition(getSwerveNearestZeroPosition());
+        }
+
+        bool isAtPositionWithinTolerance(const double &position) {
+
+            //If the current position is close enough to where we want to go (within one tolerance value)...
+            return abs(position - getSwervePositionSingleRotation()) < R_swerveTrainAssumePositionTolerance;
         }
 
     private:
