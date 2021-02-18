@@ -6,7 +6,6 @@
 #include <frc/XboxController.h>
 
 #include "Climber.h"
-#include "Hal.h"
 #include "Intake.h"
 #include "Launcher.h"
 #include "Limelight.h"
@@ -36,8 +35,6 @@ SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwer
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder);
-
-Hal Hal9000(intake, launcher, limelight, navX, zion);
 AutoSequence masterAuto;
 
 void Robot::RobotInit() {
@@ -56,14 +53,10 @@ void Robot::RobotInit() {
     m_autoStep = 0;
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
-    m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
-    //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
-    frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
@@ -126,9 +119,6 @@ void Robot::TeleopPeriodic() {
         navX.resetYaw();
     }
     zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
-
-    //zion.setSwerveSpeed(0);
-    //zion.setSwerveSpeed(0);
 
 
     //The second controller works in control layers on top of the basic
