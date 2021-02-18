@@ -22,15 +22,18 @@ Public Methods
 #include <rev/CANSparkMax.h>
 
 #include "RobotMap.h"
+#include <frc/Servo.h>
 
 class Launcher {
 
     public:
-        Launcher(const int &indexMotorCANID, const int &launchMotorOneCANID, const int &launchMotorTwoCANID) {
+        Launcher(const int &indexMotorCANID, const int &launchMotorOneCANID, const int &launchMotorTwoCANID, const int &rightServoPort, const int &leftServoPort) {
 
             indexMotor = new rev::CANSparkMax(indexMotorCANID, rev::CANSparkMax::MotorType::kBrushed);
             launchMotorOne = new rev::CANSparkMax(launchMotorOneCANID, rev::CANSparkMax::MotorType::kBrushless);
             launchMotorTwo = new rev::CANSparkMax(launchMotorTwoCANID, rev::CANSparkMax::MotorType::kBrushless);
+            rightServo = new frc::Servo(rightServoPort);
+            leftServo = new frc::Servo(leftServoPort);
         }
 
         void setIndexSpeed(const double &speedToSet = 0) {
@@ -48,10 +51,37 @@ class Launcher {
             //Invert the inversion for the second motor,
             //as they are mounted on opposite sides.
             launchMotorTwo->Set(speedToSet);
+
+            
         }
+
+        enum SetMode {
+            kSetFullRange,
+            kSetAngle
+        };
+
+        // FYI the speed is set 0 as max backwards speed, 90 is full stop, 180 is full forwards speed. Angle is set in degrees.
+    
+        void setServo (SetMode mode, double toBeSet) {
+
+             if (mode == SetMode::kSetFullRange) {
+
+                 rightServo->Set(1 - toBeSet);
+                 leftServo->Set(toBeSet);
+             }
+             if (mode == SetMode::kSetAngle) {
+
+                rightServo->SetAngle(180 - toBeSet);
+                leftServo->SetAngle(toBeSet);
+
+             }
+        }
+
 
     private:
         rev::CANSparkMax *indexMotor;
         rev::CANSparkMax *launchMotorOne;
         rev::CANSparkMax *launchMotorTwo;
+        frc::Servo *rightServo;
+        frc::Servo *leftServo; 
 };

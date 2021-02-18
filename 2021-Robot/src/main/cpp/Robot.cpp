@@ -26,7 +26,7 @@ frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
 Intake intake(R_CANIDMotorIntake);
-Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo);
+Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_PWMPortRightServo, R_PWMPortLeftServo);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
 Recorder recorder;
@@ -49,6 +49,7 @@ void Robot::RobotInit() {
     m_speedIntake           = 0;
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
+    m_servoPosition         = 0;
 
     m_autoStep = 0;
 
@@ -197,6 +198,14 @@ void Robot::TeleopPeriodic() {
 
             m_speedLauncherLaunch = 0;
         }
+        if (playerTwo->GetBumperPressed(frc::GenericHID::kLeftHand)) {
+
+            m_servoPosition = m_servoPosition - 0.25;
+        }
+        else if (playerTwo->GetBumperPressed(frc::GenericHID::kRightHand)) {
+           
+            m_servoPosition = m_servoPosition + 0.25;
+        }
     }
 
     //Once all layers have been evaluated, write out all of their values.
@@ -209,6 +218,7 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
+    launcher.setServo(Launcher::kSetFullRange, m_servoPosition);
 }
 void Robot::DisabledPeriodic() {
 
