@@ -51,16 +51,13 @@ void Robot::RobotInit() {
     m_speedLauncherLaunch   = 0;
     m_servoPosition         = 0;
 
-    m_autoStep = 0;
-
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launcher", R_launcherDefaultSpeed);
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
     frc::SmartDashboard::PutString("Recorder::output_file_string", "");
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
@@ -188,13 +185,9 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetXButton()) {
 
-            m_speedLauncherLaunch = 0.65;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
+            m_speedLauncherLaunch =frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launcher", R_launcherDefaultSpeed);
         }
-        if (playerTwo->GetBButton()) {
-
-            m_speedLauncherLaunch = 0.4;//frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
-        }
-        if (!playerTwo->GetXButton() && !playerTwo->GetBButton()) {
+        if (!playerTwo->GetXButton()) {
 
             m_speedLauncherLaunch = 0;
         }

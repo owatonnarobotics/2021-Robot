@@ -30,8 +30,4 @@ class Robot : public frc::TimedRobot {
         double m_speedLauncherIndex;
         double m_speedLauncherLaunch;
         double m_servoPosition;
-
-        //This variable is used for each step of autonomous. See Hal
-        //for more detail.
-        int m_autoStep;
 };

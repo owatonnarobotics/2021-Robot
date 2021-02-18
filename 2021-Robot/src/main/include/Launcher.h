@@ -44,9 +44,6 @@ class Launcher {
         }
         void setLaunchSpeed(const double &speedToSet = 0) {
 
-            //If the supplied speed is less than idling speed,
-            //set idling speed instead.
-            const double actualSpeedToSet = speedToSet < R_launcherDefaultSpeedLaunch ? R_launcherDefaultSpeedLaunchClose : speedToSet;
             launchMotorOne->Set(-speedToSet);
             //Invert the inversion for the second motor,
             //as they are mounted on opposite sides.
