@@ -39,9 +39,8 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
         Due to this, it must be reset when not in movement to allow
         this behavior to occur...
         */
-        setDriveSpeed(0);
-        setSwerveSpeed(0);
-        //else assumeNearestZeroPosition();
+        setDriveSpeed();
+        setSwerveSpeed();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its

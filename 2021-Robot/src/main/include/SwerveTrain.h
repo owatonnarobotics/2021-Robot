@@ -200,26 +200,13 @@ class SwerveTrain {
         }
         bool getControllerInDeadzone(const double x, const double y, const double z) {
 
-            const double absX = abs(x);
-            const double absY = abs(y);
-            const double absZ = abs(z);
-            const double zone = R_deadzoneController;
-
-            if (absX < zone && absY < zone && absZ < zone) {
-
-                return true;
-            }
-            return false;
+            return abs(x) < R_deadzoneController && abs(y) < R_deadzoneController && abs(z) < R_deadzoneController;
         }
         void forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
 
-            double absX = abs(x);
-            double absY = abs(y);
-            double absZ = abs(z);
-
-            if (absX < R_deadzoneController) {x = 0;}
-            if (absY < R_deadzoneController) {y = 0;}
-            if (absZ < R_deadzoneController) {z = 0;}
+            if (abs(x) < R_deadzoneController) {x = 0;}
+            if (abs(y) < R_deadzoneController) {y = 0;}
+            if (abs(z) < R_deadzoneController) {z = 0;}
         }
         //TODO: Inline function documentation
         void optimizeControllerXYToZ(const double &x, const double &y, double &z) {
