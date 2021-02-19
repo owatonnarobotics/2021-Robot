@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdio.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 class Recorder {
@@ -19,7 +20,7 @@ class Recorder {
 
         void Record(const double x, const double y, const double z) {
 
-            m_log << std::setprecision(R_zionAutoJoystickRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1; 
+            m_log << std::setprecision(R_zionAutoJoystickRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1;
             SetStatus("Recording in progress...");
         }
 
@@ -30,10 +31,12 @@ class Recorder {
                 
                 m_old = newStr;
                 SetStatus(newStr);
-                std::fstream usb;
-                usb.open("/u/" + frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown"), std::ios::out | std::ios::trunc);
-                usb << m_log.str() << "x";
-                usb.close();
+                std::string fullPath = "/u/" + frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown");
+                remove(fullPath.c_str());
+                std::fstream file;
+                file.open(fullPath, std::ios::out);
+                file << m_log.str() << "x";
+                file.close();
             }
         }
 

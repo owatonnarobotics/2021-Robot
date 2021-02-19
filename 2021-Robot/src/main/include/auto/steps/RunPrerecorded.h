@@ -55,7 +55,8 @@ public:
                     if (!m_values.empty()) {
 
                         m_currentValue = m_values.begin();
-                        m_endValue = std::prev(m_values.end());
+                        m_endValue = m_values.end();
+                        _Log("File successfully parsed! The run should take " + std::to_string(m_values.size() / 20.0) + " seconds");
                     }
                     else {
 

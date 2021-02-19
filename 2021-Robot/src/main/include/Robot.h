@@ -30,4 +30,6 @@ class Robot : public frc::TimedRobot {
         double m_speedLauncherIndex;
         double m_speedLauncherLaunch;
         double m_servoPosition;
+        double m_zeroButtonWasPressed;
+        double m_swerveBrake;
 };

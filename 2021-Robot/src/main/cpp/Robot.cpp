@@ -42,7 +42,7 @@ void Robot::RobotInit() {
     playerOne = new frc::Joystick(R_controllerPortPlayerOne);
     playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
 
-    m_booleanClimberLock = true;
+    m_booleanClimberLock    = true;
     m_speedClimberClimb     = 0;
     m_speedClimberTranslate = 0;
     m_speedClimberWheel     = 0;
@@ -50,6 +50,7 @@ void Robot::RobotInit() {
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
     m_servoPosition         = 0;
+    m_swerveBrake           = false;
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
@@ -108,15 +109,22 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
 
-    if (playerOne->GetRawButtonPressed(3)) {
+    if (playerTwo->GetYButton()) {
 
         zion.setZeroPosition();
     }
-    if (playerOne->GetRawButton(1)) {
+    if (playerTwo->GetBButton()) {
 
         navX.resetYaw();
     }
-    zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerOne->GetRawButton(12), playerOne->GetRawButton(6));
+    if (playerTwo->GetAButton()) {
+
+        zion.assumeNearestZeroPosition();
+    }
+    else {
+    
+        zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerTwo->GetBumper(frc::GenericHID::kLeftHand), playerTwo->GetBumper(frc::GenericHID::kRightHand));
+    }
 
 
     //The second controller works in control layers on top of the basic
@@ -219,11 +227,22 @@ void Robot::DisabledPeriodic() {
     //held, unlock the swerves for zeroing. Once released, lock them again. The
     //switch is inverted by default, so no inversion is required. This is in
     //disabled on the off-chance that the switch got bumped during match play.
-    zion.setSwerveBrake(switchSwerveUnlock.Get());
+    if (switchSwerveUnlock.Get()) {
+
+        if (!m_zeroButtonWasPressed) {
+
+            m_zeroButtonWasPressed = true;
+            m_swerveBrake = !m_swerveBrake;
+            zion.setSwerveBrake(m_swerveBrake);
+        }
+    }
+    else {
+
+        m_zeroButtonWasPressed = false;
+    }
     //Whenever Zion is on, allow control of the Limelight from P2. This permits
     //using it for manual alignment at any time, before or after the match.
-    limelight.setLime(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
-    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kRightHand));
+    limelight.setLime(!m_swerveBrake);
 }
 
 #ifndef RUNNING_FRC_TESTS
