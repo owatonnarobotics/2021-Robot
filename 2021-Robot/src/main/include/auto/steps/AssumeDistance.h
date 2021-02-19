@@ -43,7 +43,7 @@ class AssumeDistance : public AutoStep {
             else {
 
                 //Stop moving, clean up, and return true.
-                m_zion->setDriveSpeed();
+                m_zion->stop();
                 return true;
             }
             

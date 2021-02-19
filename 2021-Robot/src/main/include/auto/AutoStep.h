@@ -14,19 +14,19 @@ class AutoStep {
 
         void Init() {
 
-            //std::cout << m_name << " init" << std::endl;
+            wpi::outs() << m_name << " init\n";
             _Init();
         }
 
         bool Execute() {
 
-            //std::cout << m_name << " execute" << std::endl;
+            wpi::outs() << m_name << " execute\n";
             return _Execute();
         }
 
         void Cleanup() {
 
-            //std::cout << m_name << " cleanup" << std::endl;
+            wpi::outs() << m_name << " cleanup\n";
             _Cleanup();
         }
 

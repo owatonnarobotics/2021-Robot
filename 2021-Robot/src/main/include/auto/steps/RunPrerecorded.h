@@ -86,8 +86,7 @@ public:
             // If we are at the end of the file
             if (m_currentValue == m_endValue) {
 
-                m_zion->setSwerveSpeed(0);
-                m_zion->setDriveSpeed(0);
+                m_zion->stop();
                 _Log("Finished executing recording");
                 return true;
             }
@@ -103,8 +102,7 @@ public:
         }
         else {
 
-            m_zion->setSwerveSpeed(0);
-            m_zion->setDriveSpeed(0);
+            m_zion->stop();
             _Log("Finished executing recording; there was no data");
             return true;
         }

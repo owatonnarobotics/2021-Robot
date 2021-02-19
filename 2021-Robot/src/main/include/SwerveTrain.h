@@ -110,6 +110,11 @@ class SwerveTrain {
             m_rearLeft->setSwerveSpeed(swerveSpeed);
             m_rearRight->setSwerveSpeed(swerveSpeed);
         }
+        void stop() {
+
+            setDriveSpeed();
+            setSwerveSpeed();
+        }
         void setDriveBrake(const bool &brake) {
 
             m_frontRight->setDriveBrake(brake);

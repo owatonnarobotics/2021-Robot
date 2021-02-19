@@ -50,8 +50,7 @@ class AssumeRotationDegrees : public AutoStep {
                 else {
 
                     //Stop moving, reset the wheels, clean up, and return true.
-                    m_zion->setDriveSpeed();
-                    m_zion->setSwerveSpeed();
+                    m_zion->stop();
                     return true;
                 }
             }

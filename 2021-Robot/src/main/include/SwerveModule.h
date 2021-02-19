@@ -116,6 +116,11 @@ class SwerveModule {
 
             m_swerveMotor->Set(speedToSet);
         }
+        void stop() {
+
+            setDriveSpeed();
+            setSwerveSpeed();
+        }
         void setDriveBrake(const bool &brake) {
 
             if (brake) {

@@ -89,7 +89,8 @@ void Robot::AutonomousInit() {
 }
 void Robot::AutonomousPeriodic() {
 
-    //Lock the drive wheels before beginning for accuracy.
+    //Lock the drive and swerve wheels before beginning for accuracy.
+    zion.setSwerveBrake(true);
     zion.setDriveBrake(true);
     //Run the auto!
     if (masterAuto.Execute()) {
@@ -99,10 +100,7 @@ void Robot::AutonomousPeriodic() {
 }
 void Robot::TeleopInit() {
 
-    //To clean up adter auto, confirm the swerves are locked and unlock
-    //the drive train, and go to the pre-calibrated zero position set up at the
-    //beginning of auto to begin the match.
-    //zion.setZeroPosition();
+    //To clean up adter auto, confirm the swerves and drives are locked
     zion.setSwerveBrake(true);
     zion.setDriveBrake(true);
 }
@@ -222,10 +220,9 @@ void Robot::TeleopPeriodic() {
 }
 void Robot::DisabledPeriodic() {
 
-    //Whenever Zion is disabled, if the unlock swerve button is pressed and
-    //held, unlock the swerves for zeroing. Once released, lock them again. The
-    //switch is inverted by default, so no inversion is required. This is in
-    //disabled on the off-chance that the switch got bumped during match play.
+    //Whenever Zion is disabled, check if the lock switch has been pressed. If
+    //so, toggle the current swerve module lock state. This is useful when
+    //zeroing the wheels (yay zero team).
     if (switchSwerveUnlock.Get()) {
 
         if (!m_zeroButtonWasPressed) {
@@ -241,7 +238,9 @@ void Robot::DisabledPeriodic() {
     }
     //Whenever Zion is on, allow control of the Limelight from P2. This permits
     //using it for manual alignment at any time, before or after the match.
-    limelight.setLime(!m_swerveBrake);
+    //Also turn on if the swerve modules are in coast.
+    limelight.setLime(!m_swerveBrake || playerTwo->GetBumper(frc::GenericHID::kLeftHand));
+    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
 }
 
 #ifndef RUNNING_FRC_TESTS

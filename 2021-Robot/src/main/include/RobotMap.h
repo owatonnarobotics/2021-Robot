@@ -49,18 +49,6 @@ const double R_deadzoneController = .1;
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
 const double R_deadzoneControllerZ = .1;
-// This deadzone is for the maximum allowable Limelight offset.
-const double R_deadzoneLimelightX = 0.75;
-
-//And this is the execution cap for how fast manual zeroing can occur.
-const double R_executionCapControllerZero = .1;
-
-//These are the playerTwo raw controller buttons that are used for manually
-//zeroing Zion one wheel at a time by holding them down.
-const int R_zeroButtonFR = 0;
-const int R_zeroButtonFL = 0;
-const int R_zeroButtonRL = 0;
-const int R_zeroButtonRR = 0;
 /*___End Controller Settings___*/
 
 /*_____Global Robot Variable Settigns_____*/
@@ -112,7 +100,6 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
-/*___End Global Robot Variable Settings___*/
 
 //TODO: Why inverted?
 const VectorDouble R_zionVectorForward(0, -1);
@@ -121,3 +108,4 @@ const VectorDouble R_zionVectorBackward(0,1);
 const VectorDouble R_zionVectorLeft(1,0);
 
 const double R_circumfrenceWheel = 4 * M_PI;
+/*___End Global Robot Variable Settings___*/
