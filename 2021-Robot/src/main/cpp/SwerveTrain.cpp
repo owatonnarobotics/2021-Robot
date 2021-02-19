@@ -1,13 +1,11 @@
 #include <math.h>
 
-#include <frc/Joystick.h>
-
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
+void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
 
     double x = -rawX;
     double y = -rawY;
@@ -126,69 +124,6 @@ void SwerveTrain::driveController(const double rawX, const double rawY, const do
         m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
         m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * executionCap);
     }
-}
-
-void SwerveTrain::zeroController(frc::Joystick *controller) {
-
-    //This one is also built for being upside down, so invert it.
-    const double controllerTurningMagnitude = -controller->GetZ();
-
-    if (controller->GetRawButton(R_zeroButtonFR)) {
-
-        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
-    }
-    else if (controller->GetRawButton(R_zeroButtonFL)) {
-
-        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
-    }
-    else if (controller->GetRawButton(R_zeroButtonRL)) {
-
-        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
-    }
-    else if (controller->GetRawButton(R_zeroButtonRR)) {
-
-        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
-    }
-    else {
-
-        setZeroPosition();
-    }
-}
-
-double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
-
-    //Invert both the x and y once again, as the logic is written for an
-    //upside-down Zion...
-    const double x = -controller->GetX(frc::GenericHID::kLeftHand);
-    const double y = -controller->GetY(frc::GenericHID::kLeftHand);
-    //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
-    VectorDouble center(0, 1);
-    VectorDouble current(x, y);
-
-    //Get the dot produt of the vectors for use in calculation...
-    const double dotProduct = center * current;
-    //Multiply each vector's magnitude together for use in calculation...
-    const double magnitudeProduct = center.magnitude() * current.magnitude();
-    //The cosine of the angle we want in rad is the dot product over the magnitude product...
-    const double cosineAngle = dotProduct / magnitudeProduct;
-    //The angle we want is the arccosine of its cosine...
-    double angleRad = acos(cosineAngle);
-    //If an imaginary situation is presented, set the angle equal to 0...
-    if (magnitudeProduct == 0) {
-
-       angleRad = 0;
-    }
-
-    //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump
-    //to 2pi and subtract the gradually decreasing angle...
-    if (x < 0) {
-
-        angleRad = (2 * M_PI) - angleRad;
-    }
-    //The decimal total of the whole circle is the radians over 2pi...
-    double decimalTotalCircle = ((angleRad) / (2 * M_PI));
-    //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
-    return decimalTotalCircle * R_nicsConstant;
 }
 double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 

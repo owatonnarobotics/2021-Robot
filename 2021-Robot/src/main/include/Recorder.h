@@ -20,7 +20,7 @@ class Recorder {
 
         void Record(const double x, const double y, const double z) {
 
-            m_log << std::setprecision(R_zionAutoJoystickRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1;
+            m_log << std::setprecision(R_zionAutoControllerRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1;
             SetStatus("Recording in progress...");
         }
 

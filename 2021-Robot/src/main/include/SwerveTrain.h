@@ -45,21 +45,11 @@ Public Methods
         value is. Useful for low-level things.
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
-    void driveController(frc::Joystick *controller)
-        Fully drives the swerve train on the supplied controller. If precise,
+    void drive(const double x, const double y, const double z, const bool precision, const bool record)
+        Fully drives the swerve train on the supplied x, y, and z values. If precise,
         it scales all values according to a R_ constant and doesn't re-center
         after maneuvering to allow for slow, incredibly precise positioning by
         hand in the full range of the controller.
-    void zeroController(frc::Joystick *controller)
-        Allows use of a controller through a mapped button which is held down
-        in correspondence to a motor to slowly override its zero from that
-        controller's joystick value. This allows manual adjustment from an
-        enabled state in case of either drift or error.
-        TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL NEED TO CHANGE.
-    double getClockwiseREVRotationsFromCenter(frc::Joystick*)
-        Discernes how many clockwise REV rotations from center the current
-        location of the joystick is using vector trigonometry and properties.
-        See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
 
 Private Methods
 
@@ -71,27 +61,19 @@ Private Methods
         position.
     double getLargestMagnitudeValue(const double&, const double&, const double&, const double&)
         Returns the largest of the four values passed to the function.
-    double getControllerAbsoluteMagnitude(frc::Joystick*)
-        Gets the unsigned velocity of the control stick using only absolute
-        value.
-    bool getControllerInDeadzone(frc::Joystick*)
-        If all axis of the controller are within their RobotMap deadzone
-        variables for playerOne's controller, returns true; otherwise, returns
-        false.
     void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&)
         If any of the passed X, Y, or Z values fall outside of their global
         deadzone, they will be set to 0. Otherwise, they are untouched.
     void optimizeControllerXYToZ(const double&, const double&, double &)
         Scales the value of Z with a propotion constant to the magnitude of
         X and Y. Makes rotation harder to incude as speed increases, which
-        makes strafing with a joystick much more reliable.
+        makes strafing with a controller much more reliable.
 */
 
 #pragma once
 
 #include <math.h>
 
-#include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include "rev/CANSparkMax.h"
@@ -204,13 +186,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(const double x, const double y, const double z, const bool precision, const bool record);
-        void zeroController(frc::Joystick *controller);
-
-    private:
-
-        double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
-    public:
+        void drive(const double x, const double y, const double z, const bool precision, const bool record);
 
         //This is very useful in accurate auto positioning, so it is
         //overriden public, specifically for Hal pass use at a low level.
@@ -221,16 +197,6 @@ class SwerveTrain {
         double getLargestMagnitudeValue(const double &frVal, const double &flVal, const double &rlVal, const double &rrVal) {
 
             return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
-        }
-
-        double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
-
-            //Get the absolute values of the joystick coordinates
-            double absX = abs(controller->GetX());
-            double absY = abs(controller->GetY());
-
-            //Return the sum of the coordinates as a knock-off magnitude
-            return absX + absY;
         }
         bool getControllerInDeadzone(const double x, const double y, const double z) {
 

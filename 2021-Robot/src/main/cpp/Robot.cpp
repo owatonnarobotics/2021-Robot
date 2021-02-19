@@ -2,7 +2,6 @@
 #include <frc/DigitalInput.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/Joystick.h>
 #include <frc/XboxController.h>
 
 #include "Climber.h"
@@ -23,7 +22,7 @@
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
-frc::Joystick *playerOne;
+frc::XboxController *playerOne;
 frc::XboxController *playerTwo;
 Intake intake(R_CANIDMotorIntake);
 Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_PWMPortRightServo, R_PWMPortLeftServo);
@@ -39,7 +38,7 @@ AutoSequence masterAuto;
 
 void Robot::RobotInit() {
 
-    playerOne = new frc::Joystick(R_controllerPortPlayerOne);
+    playerOne = new frc::XboxController(R_controllerPortPlayerOne);
     playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
 
     m_booleanClimberLock    = true;
@@ -109,21 +108,21 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
 
-    if (playerTwo->GetYButton()) {
+    if (playerOne->GetYButton()) {
 
         zion.setZeroPosition();
     }
-    if (playerTwo->GetBButton()) {
+    if (playerOne->GetBButton()) {
 
         navX.resetYaw();
     }
-    if (playerTwo->GetAButton()) {
+    if (playerOne->GetAButton()) {
 
         zion.assumeNearestZeroPosition();
     }
     else {
     
-        zion.driveController(playerTwo->GetX(frc::GenericHID::kLeftHand), playerTwo->GetY(frc::GenericHID::kLeftHand), playerTwo->GetX(frc::GenericHID::kRightHand), playerTwo->GetBumper(frc::GenericHID::kLeftHand), playerTwo->GetBumper(frc::GenericHID::kRightHand));
+        zion.drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand));
     }
 
 
