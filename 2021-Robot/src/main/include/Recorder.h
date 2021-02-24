@@ -2,12 +2,12 @@
 #define RECORDER_H
 
 #include <sstream>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <stdio.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/DriverStation.h>
 
 class Recorder {
 
@@ -15,28 +15,43 @@ class Recorder {
 
         Recorder() {
 
-            m_old = "";
+            m_log.str("");
+            m_log.clear();
+            m_counter = 0;
         }
 
         void Record(const double x, const double y, const double z) {
 
             m_log << std::setprecision(R_zionAutoControllerRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1;
             SetStatus("Recording in progress...");
+            m_counter++;
         }
 
         void Publish() {
 
             std::string newStr = m_log.str();
-            if (newStr != m_old) {
+            if (newStr != "") {
                 
-                m_old = newStr;
                 SetStatus(newStr);
-                std::string fullPath = "/u/" + frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown");
-                remove(fullPath.c_str());
-                std::fstream file;
-                file.open(fullPath, std::ios::out);
-                file << m_log.str() << "x";
-                file.close();
+                std::string outputString = frc::SmartDashboard::GetString("Recorder::output_file_string", "unknown");
+                std::string fullPath = "/u/" + outputString;
+                std::string logAsStr = m_log.str() + "x";
+                std::ofstream myFile(fullPath, std::ios::out | std::ios::trunc);
+                //myFile.flush();
+                if (myFile.is_open()) {
+                
+                    frc::DriverStation::ReportError("About to write "/*the following to \"" + fullPath + "\": " + logAsStr + " with "*/ + std::to_string(m_counter) + " updates");
+                    myFile << logAsStr;
+                    myFile.close();
+                }
+                else {
+
+                    frc::DriverStation::ReportError("Unable to open " + fullPath + " for recording");
+                }
+                frc::SmartDashboard::PutString("Recorder::output_file::" + outputString, logAsStr);
+                m_log.str("");
+                m_log.clear();
+                m_counter = 0;
             }
         }
 
@@ -47,7 +62,7 @@ class Recorder {
 
     private:
         std::stringstream m_log;
-        std::string m_old;
+        int m_counter;
 };
 
 #endif

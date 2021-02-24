@@ -5,11 +5,127 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
+SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet) {
+
+    m_frontRight = &frontRightModule;
+    m_frontLeft = &frontLeftModule;
+    m_rearLeft = &rearLeftModule;
+    m_rearRight = &rearRightModule;
+    navX = &navXToSet;
+    m_recorder = &recorderToSet;
+}
+
+void SwerveTrain::setDriveSpeed(const double &driveSpeed) {
+
+    m_frontRight->setDriveSpeed(driveSpeed);
+    m_frontLeft->setDriveSpeed(driveSpeed);
+    m_rearLeft->setDriveSpeed(driveSpeed);
+    m_rearRight->setDriveSpeed(driveSpeed);
+}
+
+void SwerveTrain::setSwerveSpeed(const double &swerveSpeed) {
+
+    m_frontRight->setSwerveSpeed(swerveSpeed);
+    m_frontLeft->setSwerveSpeed(swerveSpeed);
+    m_rearLeft->setSwerveSpeed(swerveSpeed);
+    m_rearRight->setSwerveSpeed(swerveSpeed);
+}
+
+void SwerveTrain::setDriveBrake(const bool &brake) {
+
+    m_frontRight->setDriveBrake(brake);
+    m_frontLeft->setDriveBrake(brake);
+    m_rearLeft->setDriveBrake(brake);
+    m_rearRight->setDriveBrake(brake);
+}
+
+void SwerveTrain::setSwerveBrake(const bool &brake) {
+
+    m_frontRight->setSwerveBrake(brake);
+    m_frontLeft->setSwerveBrake(brake);
+    m_rearLeft->setSwerveBrake(brake);
+    m_rearRight->setSwerveBrake(brake);
+}
+
+void SwerveTrain::stop() {
+
+    setDriveSpeed();
+    setSwerveSpeed();
+}
+
+void SwerveTrain::setZeroPosition(const bool &verbose) {
+
+    m_frontRight->setZeroPosition();
+    m_frontLeft->setZeroPosition();
+    m_rearLeft->setZeroPosition();
+    m_rearRight->setZeroPosition();
+
+    if (verbose) {
+
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->getSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->getSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->getSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->getSwerveZeroPosition());
+    }
+}
+
+void SwerveTrain::assumeZeroPosition() {
+
+    m_frontRight->assumeSwerveZeroPosition();
+    m_frontLeft->assumeSwerveZeroPosition();
+    m_rearLeft->assumeSwerveZeroPosition();
+    m_rearRight->assumeSwerveZeroPosition();
+}
+
+void SwerveTrain::assumeNearestZeroPosition() {
+
+    m_frontRight->assumeSwerveNearestZeroPosition();
+    m_frontLeft->assumeSwerveNearestZeroPosition();
+    m_rearLeft->assumeSwerveNearestZeroPosition();
+    m_rearRight->assumeSwerveNearestZeroPosition();
+}
+
+bool SwerveTrain::assumeTurnAroundCenterPositions() {
+
+    return  m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
+            m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
+            m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
+            m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+}
+
+void SwerveTrain::setZionMotorsToVector(const VectorDouble &vectorToSet) {
+
+    m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+    m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+    m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+    m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+}
+
+bool SwerveTrain::zionMotorsAreAtVector(const VectorDouble &vectorToTest) {
+
+    return m_frontRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+            m_frontLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+            m_rearLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
+            m_rearRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest));
+}
+
+void SwerveTrain::publishSwervePositions() {
+
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFR", m_frontRight->getSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFL", m_frontLeft->getSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRL", m_rearLeft->getSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
+}
+
 void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
 
     double x = -rawX;
     double y = -rawY;
     double z = rawZ;
+
+    frc::SmartDashboard::PutNumber("X", x);
+    frc::SmartDashboard::PutNumber("Y", y);
+    frc::SmartDashboard::PutNumber("Z", z);
 
     if (record) {
 
@@ -167,4 +283,36 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     }
     angleRad *= (180. / M_PI);
     return angleRad;
+}
+
+bool SwerveTrain::getControllerInDeadzone(const double x, const double y, const double z) {
+
+    return abs(x) < R_deadzoneController && abs(y) < R_deadzoneController && abs(z) < R_deadzoneController;
+}
+
+void SwerveTrain::forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
+
+    if (abs(x) < R_deadzoneController) {x = 0;}
+    if (abs(y) < R_deadzoneController) {y = 0;}
+    if (abs(z) < R_deadzoneControllerZ) {z = 0;}
+}
+
+void SwerveTrain::optimizeControllerXYToZ(const double &x, const double &y, double &z) {
+
+    double magnitudeXY = sqrt(x * x + y * y);
+    double absZ = abs(z);
+    double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
+
+    if (z > deadzoneAdjustmentZ) {
+
+        z -= (deadzoneAdjustmentZ - R_deadzoneController);
+    }
+    else if (z < -deadzoneAdjustmentZ) {
+
+        z += (deadzoneAdjustmentZ - R_deadzoneController);
+    }
+    if (absZ < deadzoneAdjustmentZ) {
+
+        z = 0;
+    }
 }

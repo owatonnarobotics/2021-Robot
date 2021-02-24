@@ -24,12 +24,16 @@ public:
 
     void _Init() {
 
+        m_values.clear();
         std::ifstream valuesFile("/u/" + m_path);
         if (valuesFile.is_open()) {
             
             std::ostringstream oss;
+            oss.str("");
+            oss.clear();
             oss << valuesFile.rdbuf();
             std::string stringValues = oss.str();
+           // _Log(stringValues);
             if (stringValues.length() >= R_zionAutoControllerTotalDigits * 3) {
                 
                 if (stringValues.at(stringValues.length() - 1) == 'x') {
@@ -56,7 +60,8 @@ public:
 
                         m_currentValue = m_values.begin();
                         m_endValue = m_values.end();
-                        _Log("File successfully parsed! The run should take " + std::to_string(m_values.size() / 20.0) + " seconds");
+                        _Log("File successfully parsed! The run should take " + std::to_string(m_values.size() / 50.0) + " seconds");
+                        _Log("Vector has " + std::to_string(m_values.size()) + " ControllerState elements");
                     }
                     else {
 

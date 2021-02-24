@@ -44,16 +44,16 @@ const int R_controllerPortPlayerOne = 0;
 const int R_controllerPortPlayerTwo = 1;
 
 //This deadzone is used to determine when the controller is completely motionless
-const double R_deadzoneController = .1;
+const double R_deadzoneController = .15;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
-const double R_deadzoneControllerZ = .1;
+const double R_deadzoneControllerZ = .3;
 /*___End Controller Settings___*/
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_executionCapZion = .8;
+const double R_executionCapZion = .65;
 //This is at what rate the regular execution cap is scaled for precision driving.
 const double R_executionCapZionPrecision = .25 * R_executionCapZion;
 //This one is for running the intake motors.

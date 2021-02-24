@@ -92,133 +92,29 @@ Private Methods
 class SwerveModule {
 
     public:
-        SwerveModule(const int &canDriveID, const int &canSwerveID) {
+        SwerveModule(const int &canDriveID, const int &canSwerveID);
 
-            m_driveMotor = new rev::CANSparkMax(canDriveID, rev::CANSparkMax::MotorType::kBrushless);
-            m_driveMotorEncoder = new rev::CANEncoder(m_driveMotor->GetEncoder());
-            m_swerveMotor = new rev::CANSparkMax(canSwerveID, rev::CANSparkMax::MotorType::kBrushless);
-            m_swerveMotorEncoder = new rev::CANEncoder(m_swerveMotor->GetEncoder());
+        void setDriveSpeed(const double &speedToSet = 0);
+        void setSwerveSpeed(const double &speedToSet = 0);
+        void setDriveBrake(const bool &brake);
+        void setSwerveBrake(const bool &brake);
+        void stop();
+        void setZeroPosition();
 
-            //Default the swerve's zero position to its power-on position.
-            m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
-
-            //Allow the drive motor to coast, but brake the swerve motor for accuracy.
-            //These must be set as they become overwritten from code.
-            m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
-            m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-        }
-
-        void setDriveSpeed(const double &speedToSet = 0) {
-
-            m_driveMotor->Set(speedToSet);
-        }
-        void setSwerveSpeed(const double &speedToSet = 0) {
-
-            m_swerveMotor->Set(speedToSet);
-        }
-        void stop() {
-
-            setDriveSpeed();
-            setSwerveSpeed();
-        }
-        void setDriveBrake(const bool &brake) {
-
-            if (brake) {
-
-                m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-            }
-            else {
-
-                m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
-            }
-        }
-        void setSwerveBrake(const bool &brake) {
-
-            if (brake) {
-
-                m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-            }
-            else {
-
-                m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
-            }
-        }
-        void setZeroPosition() {
-
-            m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
-        }
-
-        double getDrivePosition() {
-
-            return m_driveMotorEncoder->GetPosition();
-        }
-        double getSwervePosition() {
-
-            return m_swerveMotorEncoder->GetPosition();
-        }
-        double getSwervePositionSingleRotation() {
-
-            double clockwiseNicsFromZero = m_swerveMotorEncoder->GetPosition() - m_swerveZeroPosition;
-            //If more than a full rotation from zero...
-            if (clockwiseNicsFromZero >= R_nicsConstant) {
-
-                //Return the most local equivalent position...
-                return fmod(clockwiseNicsFromZero, R_nicsConstant);
-            }
-            else {
-
-                //Otherwise, return only the position.
-                return clockwiseNicsFromZero;
-            }
-        }
-        double getSwerveZeroPosition() {
-
-            return m_swerveZeroPosition;
-        }
-        double getSwerveNearestZeroPosition() {
-
-            //If a full rotation minus the curent position is less than half of Nic's Constant,
-            //the position is within the second or third quadrant, so a rotation to
-            //Nic's Constant is the fastest path...
-            if (R_nicsConstant - getSwervePositionSingleRotation() < (R_nicsConstant / 2)) {
-
-                return R_nicsConstant;
-            }
-            //Otherwise, going to 0 from the first or second quadrant is going to be faster.
-            else {
-
-                return 0;
-            }
-        }
-        double getDriveSpeed() {
-
-            return m_driveMotorEncoder->GetVelocity();
-        }
-        double getSwerveSpeed() {
-
-            return m_swerveMotorEncoder->GetVelocity();
-        }
-        //TODO: Inline function documentation
-        double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle) {
-
-            return (R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.);
-        }
+        double getDrivePosition();
+        double getSwervePosition();
+        double getSwervePositionSingleRotation();
+        double getSwerveZeroPosition();
+        double getSwerveNearestZeroPosition();
+        double getDriveSpeed();
+        double getSwerveSpeed();
+        double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle);
 
         bool assumeSwervePosition(const double &positionToAssume);
-        void assumeSwerveZeroPosition() {
+        void assumeSwerveZeroPosition();
+        void assumeSwerveNearestZeroPosition();
 
-            assumeSwervePosition(m_swerveZeroPosition);
-        }
-        void assumeSwerveNearestZeroPosition() {
-
-            assumeSwervePosition(getSwerveNearestZeroPosition());
-        }
-
-        bool isAtPositionWithinTolerance(const double &position) {
-
-            //If the current position is close enough to where we want to go (within one tolerance value)...
-            return abs(position - getSwervePositionSingleRotation()) < R_swerveTrainAssumePositionTolerance;
-        }
+        bool isAtPositionWithinTolerance(const double &position);
 
     private:
         double calculateAssumePositionSpeed(const double &howFarRemainingInTravel);

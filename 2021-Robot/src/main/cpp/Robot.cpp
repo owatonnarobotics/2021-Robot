@@ -1,8 +1,8 @@
-#include <cameraserver/CameraServer.h>
 #include <frc/DigitalInput.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/XboxController.h>
+#include <frc/Joystick.h>
 
 #include "Climber.h"
 #include "Intake.h"
@@ -24,6 +24,7 @@ Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PW
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::XboxController *playerOne;
 frc::XboxController *playerTwo;
+frc::Joystick *playerThree;
 Intake intake(R_CANIDMotorIntake);
 Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo, R_PWMPortRightServo, R_PWMPortLeftServo);
 Limelight limelight;
@@ -40,6 +41,7 @@ void Robot::RobotInit() {
 
     playerOne = new frc::XboxController(R_controllerPortPlayerOne);
     playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
+    playerThree = new frc::Joystick(2);
 
     m_booleanClimberLock    = true;
     m_speedClimberClimb     = 0;
@@ -60,11 +62,11 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launcher", R_launcherDefaultSpeed);
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
     frc::SmartDashboard::PutString("Recorder::output_file_string", "");
-    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
 
+    masterAuto.Reset();
     //Set the zero position before beginning auto, as it should have been
     //calibrated before the match. This persists for the match duration unless
     //overriden.
@@ -121,6 +123,7 @@ void Robot::TeleopPeriodic() {
     else {
     
         zion.drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand));
+        //zion.drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1));
     }
 
 
