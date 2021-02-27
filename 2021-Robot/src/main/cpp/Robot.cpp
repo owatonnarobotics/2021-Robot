@@ -152,7 +152,7 @@ void Robot::AutonomousPeriodic() {
     //Run the auto!
     if (masterAuto.Execute()) {
 
-        zion.assumeNearestZeroPosition();
+        zion.assumeZeroPosition();
     }
 }
 void Robot::TeleopInit() {
@@ -175,7 +175,7 @@ void Robot::TeleopPeriodic() {
     }
     if (playerOne->GetAButton()) {
 
-        zion.assumeNearestZeroPosition();
+        zion.assumeZeroPosition();
     }
     else {
         

@@ -94,22 +94,6 @@ double SwerveModule::getSwerveZeroPosition() {
     return m_swerveZeroPosition;
 }
 
-double SwerveModule::getSwerveNearestZeroPosition() {
-
-    //If a full rotation minus the curent position is less than half of Nic's Constant,
-    //the position is within the second or third quadrant, so a rotation to
-    //Nic's Constant is the fastest path...
-    if (R_nicsConstant - getSwervePositionSingleRotation() < (R_nicsConstant / 2)) {
-
-        return R_nicsConstant;
-    }
-    //Otherwise, going to 0 from the first or second quadrant is going to be faster.
-    else {
-
-        return 0;
-    }
-}
-
 double SwerveModule::getDriveSpeed() {
 
     return m_driveMotorEncoder->GetVelocity();
@@ -120,9 +104,9 @@ double SwerveModule::getSwerveSpeed() {
     return m_swerveMotorEncoder->GetVelocity();
 }
 
-double SwerveModule::getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle) {
+double SwerveModule::absoluteVectorToNics(VectorDouble &vector, const double &angle) {
 
-    return (R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.);
+    return R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.;
 }
 
 bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
@@ -163,11 +147,6 @@ bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
 bool SwerveModule::assumeSwerveZeroPosition() {
 
     return assumeSwervePosition(m_swerveZeroPosition);
-}
-
-bool SwerveModule::assumeSwerveNearestZeroPosition() {
-
-    return assumeSwervePosition(getSwerveNearestZeroPosition());
 }
 
 bool SwerveModule::isAtPositionWithinTolerance(const double &position) {

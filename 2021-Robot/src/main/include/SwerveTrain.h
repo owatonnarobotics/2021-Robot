@@ -34,15 +34,6 @@ Public Methods
         "straight".
     void assumeZeroPosition()
         Drives the swerves to return to their zero position.
-    void assumeNearestZeroPosition()
-        Drives the swerves to the nearest Nic's Constant multiple of its zero
-        value, CW or CCW. In doing so, really only drives the swerve to either
-        0 or the value of one Nic's Constant. Since the pathfinding function
-        thinks clockwise, this ends up driving it to zero the fastest
-        way possible, making use of getSwervePositionSingleRotation() as
-        the driver function to make this possible. assumeSwerveZeroPosition()
-        cannot make this optimization, and simply goes to whatever the zero
-        value is. Useful for low-level things.
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
     void drive(const double x, const double y, const double z, const bool precision, const bool record)
@@ -53,9 +44,6 @@ Public Methods
 
 Private Methods
 
-    double getStandardDegreeAngleFromCenter(const double&, const double&)
-        Same as above, but returns the result as a degree measure in standard
-        position.
     void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&)
         If any of the passed X, Y, or Z values fall outside of their global
         deadzone, they will be set to 0. Otherwise, they are untouched.
@@ -92,7 +80,6 @@ class SwerveTrain {
 
         void setZeroPosition(const bool &verbose = false);
         bool assumeZeroPosition();
-        bool assumeNearestZeroPosition();
         bool assumeTurnAroundCenterPositions();
         void publishSwervePositions();
 
@@ -102,10 +89,6 @@ class SwerveTrain {
         void PrintDrivePositions();
 
     private:
-        double getStandardDegreeAngleFromCenter(const double &, const double &);
-        bool getControllerInDeadzone(const double, const double, const double);
-        void forceControllerXYZToZeroInDeadzone(double &, double &, double &);
-        void optimizeControllerXYToZ(const double &, const double &, double &);
         double calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees);
 
     //Allow the peices of the SwerveTrain to be public for convenient

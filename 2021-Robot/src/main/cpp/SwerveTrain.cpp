@@ -4,6 +4,7 @@
 #include "VectorDouble.h"
 #include "Launcher.h"
 #include "Limelight.h"
+#include "Controller.h"
 
 SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet, Limelight &refLime) {
 
@@ -86,14 +87,6 @@ bool SwerveTrain::assumeZeroPosition() {
             m_rearRight->assumeSwerveZeroPosition();
 }
 
-bool SwerveTrain::assumeNearestZeroPosition() {
-
-    return m_frontRight->assumeSwerveNearestZeroPosition() &&
-           m_frontLeft->assumeSwerveNearestZeroPosition() &&
-           m_rearLeft->assumeSwerveNearestZeroPosition() &&
-           m_rearRight->assumeSwerveNearestZeroPosition();
-}
-
 bool SwerveTrain::assumeTurnAroundCenterPositions() {
 
     return  m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
@@ -105,10 +98,10 @@ bool SwerveTrain::assumeTurnAroundCenterPositions() {
 bool SwerveTrain::setZionMotorsToVector(VectorDouble &vectorToSet) {
 
     double angle = navX->getYawFull();
-    return m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
-           m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
-           m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
-           m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(vectorToSet, angle));
+    return m_frontRight->assumeSwervePosition(m_frontRight->absoluteVectorToNics(vectorToSet, angle)) &&
+           m_frontLeft->assumeSwervePosition(m_frontLeft->absoluteVectorToNics(vectorToSet, angle)) &&
+           m_rearLeft->assumeSwervePosition(m_rearLeft->absoluteVectorToNics(vectorToSet, angle)) &&
+           m_rearRight->assumeSwervePosition(m_rearRight->absoluteVectorToNics(vectorToSet, angle));
 }
 
 void SwerveTrain::publishSwervePositions() {
@@ -140,13 +133,13 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.
-    forceControllerXYZToZeroInDeadzone(x, y, z);
+    Controller::forceControllerXYZToZeroInDeadzone(x, y, z);
 
     //To prevent accidental turning, optimize Z to X and Y's magnitude.
-    optimizeControllerXYToZ(x, y, z);
+    Controller::optimizeControllerXYToZ(x, y, z);
 
     //If the controller is in the total deadzone (entirely still)...
-    if (getControllerInDeadzone(x, y, z)) {
+    if (Controller::getControllerInDeadzone(x, y, z)) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and
@@ -252,71 +245,16 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
         were in degrees before to enable the use of common trigonomoetry. We
         get Nics from degrees by calling getSwerveRotatingPosition().
         */
-        m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(frontRightResultVector, angle));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(frontLeftResultVector, angle));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(rearLeftResultVector, angle));
-        m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(rearRightResultVector, angle));
+        m_frontRight->assumeSwervePosition(m_frontRight->absoluteVectorToNics(frontRightResultVector, angle));
+        m_frontLeft->assumeSwervePosition(m_frontLeft->absoluteVectorToNics(frontLeftResultVector, angle));
+        m_rearLeft->assumeSwervePosition(m_rearLeft->absoluteVectorToNics(rearLeftResultVector, angle));
+        m_rearRight->assumeSwervePosition(m_rearRight->absoluteVectorToNics(rearRightResultVector, angle));
 
         const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * executionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * executionCap);
         m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
         m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * executionCap);
-    }
-}
-
-//TODO: Inline function documentation
-double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const double &y) {
-
-    VectorDouble center(0, 1);
-    VectorDouble current(x, y);
-
-    const double dotProduct = center * current;
-    const double magnitudeProduct = center.magnitude() * current.magnitude();
-    const double cosineAngle = dotProduct / magnitudeProduct;
-    double angleRad = acos(cosineAngle);
-    if (magnitudeProduct == 0) {
-
-        angleRad = 0;
-    }
-
-    if (x < 0) {
-
-        angleRad = (2 * M_PI) - angleRad;
-    }
-    angleRad *= (180. / M_PI);
-    return angleRad;
-}
-
-bool SwerveTrain::getControllerInDeadzone(const double x, const double y, const double z) {
-
-    return abs(x) < R_deadzoneController && abs(y) < R_deadzoneController && abs(z) < R_deadzoneController;
-}
-
-void SwerveTrain::forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
-
-    if (abs(x) < R_deadzoneController) {x = 0;}
-    if (abs(y) < R_deadzoneController) {y = 0;}
-    if (abs(z) < R_deadzoneControllerZ) {z = 0;}
-}
-
-void SwerveTrain::optimizeControllerXYToZ(const double &x, const double &y, double &z) {
-
-    double magnitudeXY = sqrt(x * x + y * y);
-    double absZ = abs(z);
-    double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
-
-    if (z > deadzoneAdjustmentZ) {
-
-        z -= (deadzoneAdjustmentZ - R_deadzoneController);
-    }
-    else if (z < -deadzoneAdjustmentZ) {
-
-        z += (deadzoneAdjustmentZ - R_deadzoneController);
-    }
-    if (absZ < deadzoneAdjustmentZ) {
-
-        z = 0;
     }
 }
 

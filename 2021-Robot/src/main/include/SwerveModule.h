@@ -39,18 +39,13 @@ Public Methods
     double getSwerveZeroPosition()
         Returns the zero position of the swerve encoder (whatever the value of
         its variable is).
-    double getSwerveNearestZeroPosition()
-        Uses getSwervePositionSingleRotation() to determine if 0 or one
-        Nic's Constant is the most efficient zero for pathfinding.
-        See SwerveTrain.h for a more thorough explanation of why
-        this works.
     double getDriveSpeed()
         Returns the speed of the drive encoder in RPM.
     double getSwerveSpeed()
         Returns the speed of the swerve encoder in RPM.
     Note that the values returned by the get functions persist across disables, but
         not across power cycles.
-    double getStandardDegreeSwervePosition(VectorDouble&, const double&)
+    double absoluteVectorToNics(VectorDouble&, const double&)
         D O C U M E N T  M E
     void assumeSwervePosition(const double& positionToAssume)
         Uses a mathematical function to assign a speed to the swerve motor to
@@ -60,10 +55,6 @@ Public Methods
     void assumeSwerveZeroPosition()
         Drives the swerve to the current value of the swerve's zero position
         variable (the last set zero position).
-    void assumeSwerveNearestZeroPosition()
-        Drives the swerve to its nearest zero position (the closest multiple
-        of Nic's Constant to the zero value) either clockwise or
-        counterclockwise.
 
 Private Methods
 
@@ -105,14 +96,12 @@ class SwerveModule {
         double getSwervePosition();
         double getSwervePositionSingleRotation();
         double getSwerveZeroPosition();
-        double getSwerveNearestZeroPosition();
         double getDriveSpeed();
         double getSwerveSpeed();
-        double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle);
+        double absoluteVectorToNics(VectorDouble &vector, const double &angle);
 
         bool assumeSwervePosition(const double &positionToAssume);
         bool assumeSwerveZeroPosition();
-        bool assumeSwerveNearestZeroPosition();
 
         bool isAtPositionWithinTolerance(const double &position);
 
