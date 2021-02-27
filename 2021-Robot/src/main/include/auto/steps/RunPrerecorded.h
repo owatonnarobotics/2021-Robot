@@ -93,7 +93,7 @@ public:
             // If we are at the end of the file
             if (m_currentValue == m_endValue) {
 
-                m_zion->stop();
+                m_zion->Stop();
                 _Log("Finished executing recording");
                 return true;
             }
@@ -102,14 +102,14 @@ public:
                 double x = m_currentValue->x;
                 double y = m_currentValue->y;
                 double z = m_currentValue->z;
-                m_zion->drive(x, y, z, false, false, false);
+                m_zion->Drive(x, y, z, false, false, false);
                 m_currentValue++;
                 return false;
             }
         }
         else {
 
-            m_zion->stop();
+            m_zion->Stop();
             _Log("Finished executing recording; there was no data");
             return true;
         }

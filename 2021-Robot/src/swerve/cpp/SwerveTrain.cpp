@@ -17,102 +17,102 @@ SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeft
     m_limelight = &refLime;
 }
 
-void SwerveTrain::setDriveSpeed(const double &driveSpeed) {
+void SwerveTrain::SetDriveSpeed(const double &driveSpeed) {
 
-    m_frontRight->setDriveSpeed(driveSpeed);
-    m_frontLeft->setDriveSpeed(driveSpeed);
-    m_rearLeft->setDriveSpeed(driveSpeed);
-    m_rearRight->setDriveSpeed(driveSpeed);
+    m_frontRight->SetDriveSpeed(driveSpeed);
+    m_frontLeft->SetDriveSpeed(driveSpeed);
+    m_rearLeft->SetDriveSpeed(driveSpeed);
+    m_rearRight->SetDriveSpeed(driveSpeed);
 }
 
-void SwerveTrain::setSwerveSpeed(const double &swerveSpeed) {
+void SwerveTrain::SetSwerveSpeed(const double &swerveSpeed) {
 
-    m_frontRight->setSwerveSpeed(swerveSpeed);
-    m_frontLeft->setSwerveSpeed(swerveSpeed);
-    m_rearLeft->setSwerveSpeed(swerveSpeed);
-    m_rearRight->setSwerveSpeed(swerveSpeed);
+    m_frontRight->SetSwerveSpeed(swerveSpeed);
+    m_frontLeft->SetSwerveSpeed(swerveSpeed);
+    m_rearLeft->SetSwerveSpeed(swerveSpeed);
+    m_rearRight->SetSwerveSpeed(swerveSpeed);
 }
 
-void SwerveTrain::setDriveBrake(const bool &brake) {
+void SwerveTrain::SetDriveBrake(const bool &brake) {
 
-    m_frontRight->setDriveBrake(brake);
-    m_frontLeft->setDriveBrake(brake);
-    m_rearLeft->setDriveBrake(brake);
-    m_rearRight->setDriveBrake(brake);
+    m_frontRight->SetDriveBrake(brake);
+    m_frontLeft->SetDriveBrake(brake);
+    m_rearLeft->SetDriveBrake(brake);
+    m_rearRight->SetDriveBrake(brake);
 }
 
-void SwerveTrain::setSwerveBrake(const bool &brake) {
+void SwerveTrain::SetSwerveBrake(const bool &brake) {
 
-    m_frontRight->setSwerveBrake(brake);
-    m_frontLeft->setSwerveBrake(brake);
-    m_rearLeft->setSwerveBrake(brake);
-    m_rearRight->setSwerveBrake(brake);
+    m_frontRight->SetSwerveBrake(brake);
+    m_frontLeft->SetSwerveBrake(brake);
+    m_rearLeft->SetSwerveBrake(brake);
+    m_rearRight->SetSwerveBrake(brake);
 }
 
-void SwerveTrain::stop() {
+void SwerveTrain::Stop() {
 
-    setDriveSpeed();
-    setSwerveSpeed();
+    SetDriveSpeed();
+    SetSwerveSpeed();
 }
 
-void SwerveTrain::setZeroPosition(const bool &verbose) {
+void SwerveTrain::SetZeroPosition(const bool &verbose) {
 
-    m_frontRight->setZeroPosition();
-    m_frontLeft->setZeroPosition();
-    m_rearLeft->setZeroPosition();
-    m_rearRight->setZeroPosition();
+    m_frontRight->SetZeroPosition();
+    m_frontLeft->SetZeroPosition();
+    m_rearLeft->SetZeroPosition();
+    m_rearRight->SetZeroPosition();
 
     if (verbose) {
 
-        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->getSwerveZeroPosition());
-        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->getSwerveZeroPosition());
-        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->getSwerveZeroPosition());
-        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->getSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->GetSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->GetSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->GetSwerveZeroPosition());
+        frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->GetSwerveZeroPosition());
     }
 }
 
 void SwerveTrain::PrintDrivePositions() {
 
-    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->getDrivePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->getDrivePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->getDrivePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->getDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->GetDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->GetDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->GetDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->GetDrivePosition());
 }
 
-bool SwerveTrain::assumeZeroPosition() {
+bool SwerveTrain::AssumeZeroPosition() {
 
-    return m_frontRight->assumeSwerveZeroPosition();
-            m_frontLeft->assumeSwerveZeroPosition();
-            m_rearLeft->assumeSwerveZeroPosition();
-            m_rearRight->assumeSwerveZeroPosition();
+    return m_frontRight->AssumeSwerveZeroPosition();
+            m_frontLeft->AssumeSwerveZeroPosition();
+            m_rearLeft->AssumeSwerveZeroPosition();
+            m_rearRight->AssumeSwerveZeroPosition();
 }
 
-bool SwerveTrain::assumeTurnAroundCenterPositions() {
+bool SwerveTrain::AssumeTurnAroundCenterPositions() {
 
-    return  m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
-            m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
-            m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
-            m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+    return  m_frontRight->AssumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
+            m_frontLeft->AssumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
+            m_rearLeft->AssumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
+            m_rearRight->AssumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
 }
 
-bool SwerveTrain::setZionMotorsToVector(VectorDouble &vectorToSet) {
+bool SwerveTrain::SetZionMotorsToVector(VectorDouble &vectorToSet) {
 
     double angle = navX->getYawFull();
-    return m_frontRight->assumeSwervePosition(m_frontRight->absoluteVectorToNics(vectorToSet, angle)) &&
-           m_frontLeft->assumeSwervePosition(m_frontLeft->absoluteVectorToNics(vectorToSet, angle)) &&
-           m_rearLeft->assumeSwervePosition(m_rearLeft->absoluteVectorToNics(vectorToSet, angle)) &&
-           m_rearRight->assumeSwervePosition(m_rearRight->absoluteVectorToNics(vectorToSet, angle));
+    return m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(vectorToSet, angle)) &&
+           m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(vectorToSet, angle)) &&
+           m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(vectorToSet, angle)) &&
+           m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(vectorToSet, angle));
 }
 
-void SwerveTrain::publishSwervePositions() {
+void SwerveTrain::PrintSwervePositions() {
 
-    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFR", m_frontRight->getSwervePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFL", m_frontLeft->getSwervePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRL", m_rearLeft->getSwervePosition());
-    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFR", m_frontRight->GetSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosFL", m_frontLeft->GetSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRL", m_rearLeft->GetSwervePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record, const bool limelightLock) {
+void SwerveTrain::Drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record, const bool limelightLock) {
 
     double x = -rawX;
     double y = -rawY;
@@ -150,7 +150,7 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
         Due to this, it must be reset when not in movement to allow
         this behavior to occur...
         */
-        stop();
+        Stop();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its
@@ -169,7 +169,7 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
             if (m_limelight->getTarget()) {
 
                 //Update our rotational speed so that we turn towards the goal.
-                z = calculateLimelightLockSpeed(m_limelight->getHorizontalOffset());
+                z = CalculateLimelightLockSpeed(m_limelight->getHorizontalOffset());
             }
         }
         else {
@@ -241,27 +241,27 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
 
         /*
         Here, all of the resulting vectors are converted into Nics so that they
-        can be written to the swerve modules using assumeSwervePosition(). They
+        can be written to the swerve modules using AssumeSwervePosition(). They
         were in degrees before to enable the use of common trigonomoetry. We
         get Nics from degrees by calling getSwerveRotatingPosition().
         */
-        m_frontRight->assumeSwervePosition(m_frontRight->absoluteVectorToNics(frontRightResultVector, angle));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->absoluteVectorToNics(frontLeftResultVector, angle));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->absoluteVectorToNics(rearLeftResultVector, angle));
-        m_rearRight->assumeSwervePosition(m_rearRight->absoluteVectorToNics(rearRightResultVector, angle));
+        m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(frontRightResultVector, angle));
+        m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(frontLeftResultVector, angle));
+        m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(rearLeftResultVector, angle));
+        m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(rearRightResultVector, angle));
 
         const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
-        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * executionCap);
-        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * executionCap);
-        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
-        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * executionCap);
+        m_frontRight->SetDriveSpeed(frontRightResultVector.magnitude() * executionCap);
+        m_frontLeft->SetDriveSpeed(frontLeftResultVector.magnitude() * executionCap);
+        m_rearLeft->SetDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
+        m_rearRight->SetDriveSpeed(rearRightResultVector.magnitude() * executionCap);
     }
 }
 
 //Almost exactly the same function as
 //SwerveModule::calculateAssumePositionSpeed, except with constants for
 //limelight lock
-double SwerveTrain::calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
+double SwerveTrain::CalculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
 
     //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
     double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(howFarRemainingInTravelInDegrees))) + 5)));

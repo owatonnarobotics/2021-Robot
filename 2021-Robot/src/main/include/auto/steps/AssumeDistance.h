@@ -21,7 +21,7 @@ class AssumeDistance : public AutoStep {
             //memory for comparison once operating (since we're translating
             //in a lateral direction, we only have to care about one encoder
             //value)...
-            mInitialFrontRightDrivePosition = m_zion->m_frontRight->getDrivePosition();
+            mInitialFrontRightDrivePosition = m_zion->m_frontRight->GetDrivePosition();
             //Calculate the end goal encoder value with circumference and the
             //known amount of encoder values per rotation...
             m_targetEncoderPosition = mInitialFrontRightDrivePosition + (m_targetDistance * R_kuhnsConstant) / R_circumfrenceWheel;
@@ -34,11 +34,11 @@ class AssumeDistance : public AutoStep {
             //If we're not in tolerance for meeting the goal value (since
             //going to a distance generates no oscillation, zero can be
             //used as a tolerance)...
-            frc::SmartDashboard::PutNumber("END ACTUAL", m_zion->m_frontRight->getDrivePosition());
-            double delta = m_targetEncoderPosition - m_zion->m_frontRight->getDrivePosition();
+            frc::SmartDashboard::PutNumber("END ACTUAL", m_zion->m_frontRight->GetDrivePosition());
+            double delta = m_targetEncoderPosition - m_zion->m_frontRight->GetDrivePosition();
             if (delta > R_kuhnsConstant * .25) {
 
-                m_zion->setDriveSpeed(.15);
+                m_zion->SetDriveSpeed(.15);
                 //If we made it to here, we didn't succeed, so return false for
                 //another go at it.
                 return false;
@@ -47,7 +47,7 @@ class AssumeDistance : public AutoStep {
             else {
 
                 //Stop moving, clean up, and return true.
-                m_zion->stop();
+                m_zion->Stop();
                 return true;
             }
             

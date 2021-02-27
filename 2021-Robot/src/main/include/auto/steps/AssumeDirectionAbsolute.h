@@ -32,7 +32,7 @@ class AssumeDirectionAbsolute : public AutoStep {
 
         bool Execute() {
 
-            return m_zion->setZionMotorsToVector(*m_targetVector);
+            return m_zion->SetZionMotorsToVector(*m_targetVector);
         }
 
     private:

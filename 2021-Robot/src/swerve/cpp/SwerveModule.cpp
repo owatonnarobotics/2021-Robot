@@ -18,17 +18,17 @@ SwerveModule::SwerveModule(const int &canDriveID, const int &canSwerveID) {
     m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 }
 
-void SwerveModule::setDriveSpeed(const double &speedToSet) {
+void SwerveModule::SetDriveSpeed(const double &speedToSet) {
 
     m_driveMotor->Set(speedToSet);
 }
 
-void SwerveModule::setSwerveSpeed(const double &speedToSet) {
+void SwerveModule::SetSwerveSpeed(const double &speedToSet) {
 
     m_swerveMotor->Set(speedToSet);
 }
 
-void SwerveModule::setDriveBrake(const bool &brake) {
+void SwerveModule::SetDriveBrake(const bool &brake) {
 
     if (brake) {
 
@@ -40,7 +40,7 @@ void SwerveModule::setDriveBrake(const bool &brake) {
     }
 }
 
-void SwerveModule::setSwerveBrake(const bool &brake) {
+void SwerveModule::SetSwerveBrake(const bool &brake) {
 
     if (brake) {
 
@@ -52,28 +52,28 @@ void SwerveModule::setSwerveBrake(const bool &brake) {
     }
 }
 
-void SwerveModule::stop() {
+void SwerveModule::Stop() {
 
-    setDriveSpeed();
-    setSwerveSpeed();
+    SetDriveSpeed();
+    SetSwerveSpeed();
 }
 
-void SwerveModule::setZeroPosition() {
+void SwerveModule::SetZeroPosition() {
 
     m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
 }
 
-double SwerveModule::getDrivePosition() {
+double SwerveModule::GetDrivePosition() {
 
     return m_driveMotorEncoder->GetPosition();
 }
 
-double SwerveModule::getSwervePosition() {
+double SwerveModule::GetSwervePosition() {
 
     return m_swerveMotorEncoder->GetPosition();
 }
 
-double SwerveModule::getSwervePositionSingleRotation() {
+double SwerveModule::GetSwervePositionSingleRotation() {
 
     double clockwiseNicsFromZero = m_swerveMotorEncoder->GetPosition() - m_swerveZeroPosition;
     //If more than a full rotation from zero...
@@ -89,32 +89,32 @@ double SwerveModule::getSwervePositionSingleRotation() {
     }
 }
 
-double SwerveModule::getSwerveZeroPosition() {
+double SwerveModule::GetSwerveZeroPosition() {
 
     return m_swerveZeroPosition;
 }
 
-double SwerveModule::getDriveSpeed() {
+double SwerveModule::GetDriveSpeed() {
 
     return m_driveMotorEncoder->GetVelocity();
 }
 
-double SwerveModule::getSwerveSpeed() {
+double SwerveModule::GetSwerveSpeed() {
 
     return m_swerveMotorEncoder->GetVelocity();
 }
 
-double SwerveModule::absoluteVectorToNics(VectorDouble &vector, const double &angle) {
+double SwerveModule::AbsoluteVectorToNics(VectorDouble &vector, const double &angle) {
 
     return R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.;
 }
 
-bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
+bool SwerveModule::AssumeSwervePosition(const double &positionToAssume) {
 
-    double currentPosition = getSwervePositionSingleRotation();
+    double currentPosition = GetSwervePositionSingleRotation();
 
     //If the current position is close enough to where we want to go (within one tolerance value)...
-    if (isAtPositionWithinTolerance(positionToAssume)) {
+    if (IsAtPositionWithinTolerance(positionToAssume)) {
 
         //Stop rotating the swerve motor and skip checking anything else...
         m_swerveMotor->Set(0);
@@ -144,15 +144,15 @@ bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
     return false;
 }
 
-bool SwerveModule::assumeSwerveZeroPosition() {
+bool SwerveModule::AssumeSwerveZeroPosition() {
 
-    return assumeSwervePosition(m_swerveZeroPosition);
+    return AssumeSwervePosition(m_swerveZeroPosition);
 }
 
-bool SwerveModule::isAtPositionWithinTolerance(const double &position) {
+bool SwerveModule::IsAtPositionWithinTolerance(const double &position) {
 
     //If the current position is close enough to where we want to go (within one tolerance value)...
-    return abs(position - getSwervePositionSingleRotation()) < R_swerveTrainAssumePositionTolerance;
+    return abs(position - GetSwervePositionSingleRotation()) < R_swerveTrainAssumePositionTolerance;
 }
 
 double SwerveModule::calculateAssumePositionSpeed(const double &howFarRemainingInTravel) {

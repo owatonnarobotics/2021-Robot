@@ -84,7 +84,7 @@ void Robot::AutonomousInit() {
     //Set the zero position before beginning auto, as it should have been
     //calibrated before the match. This persists for the match duration unless
     //overriden.
-    zion.setZeroPosition();
+    zion.SetZeroPosition();
     navX.resetYaw();
     //Get which auto was selected to run in auto to test against.
     m_chooserAutoSelected = m_chooserAuto->GetSelected();
@@ -147,19 +147,19 @@ void Robot::AutonomousInit() {
 void Robot::AutonomousPeriodic() {
 
     //Lock the drive and swerve wheels before beginning for accuracy.
-    zion.setSwerveBrake(true);
-    zion.setDriveBrake(true);
+    zion.SetSwerveBrake(true);
+    zion.SetDriveBrake(true);
     //Run the auto!
     if (masterAuto.Execute()) {
 
-        zion.assumeZeroPosition();
+        zion.AssumeZeroPosition();
     }
 }
 void Robot::TeleopInit() {
 
     //To clean up adter auto, confirm the swerves and drives are locked
-    zion.setSwerveBrake(true);
-    zion.setDriveBrake(true);
+    zion.SetSwerveBrake(true);
+    zion.SetDriveBrake(true);
 }
 void Robot::TeleopPeriodic() {
 
@@ -167,7 +167,7 @@ void Robot::TeleopPeriodic() {
 
     if (playerOne->GetYButton()) {
 
-        zion.setZeroPosition();
+        zion.SetZeroPosition();
     }
     if (playerOne->GetBButton()) {
 
@@ -175,17 +175,17 @@ void Robot::TeleopPeriodic() {
     }
     if (playerOne->GetAButton()) {
 
-        zion.assumeZeroPosition();
+        zion.AssumeZeroPosition();
     }
     else {
         
         if (m_chooserController->GetSelected() == "XboxController") {
 
-            zion.drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand), playerOne->GetXButton());
+            zion.Drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand), playerOne->GetXButton());
         }
         else {
 
-            zion.drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1), playerThree->GetRawButton(6));
+            zion.Drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1), playerThree->GetRawButton(6));
         }
     }
 
@@ -300,7 +300,7 @@ void Robot::DisabledPeriodic() {
 
             m_zeroButtonWasPressed = true;
             m_swerveBrake = !m_swerveBrake;
-            zion.setSwerveBrake(m_swerveBrake);
+            zion.SetSwerveBrake(m_swerveBrake);
         }
     }
     else {

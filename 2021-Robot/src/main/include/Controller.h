@@ -1,3 +1,14 @@
+/*
+Public Function:
+    void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&)
+        If any of the passed X, Y, or Z values fall outside of their global
+        deadzone, they will be set to 0. Otherwise, they are untouched.
+    void optimizeControllerXYToZ(const double&, const double&, double &)
+        Scales the value of Z with a propotion constant to the magnitude of
+        X and Y. Makes rotation harder to incude as speed increases, which
+        makes strafing with a controller much more reliable.
+*/
+
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 

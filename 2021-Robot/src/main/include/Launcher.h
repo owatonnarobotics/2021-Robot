@@ -57,7 +57,7 @@ class Launcher {
             kSetAngle
         };
 
-        // FYI the speed is set 0 as max backwards speed, 90 is full stop, 180 is full forwards speed. Angle is set in degrees.
+        // FYI the speed is set 0 as max backwards speed, 90 is full Stop, 180 is full forwards speed. Angle is set in degrees.
     
         void setServo (SetMode mode, double toBeSet) {
 

@@ -35,7 +35,7 @@ class AssumeRotationDegrees : public AutoStep {
             //angles found with radians converted into Nics). This works as
             //this section of the code also runs as a loop, and these functions
             //handle setting values down to zero once correct...
-            if (m_zion->assumeTurnAroundCenterPositions()) {
+            if (m_zion->AssumeTurnAroundCenterPositions()) {
 
                 //If we're not within tolerance for meeting the goal angle...
                 if (abs(m_resultingAngle - m_navX->getAngle()) > R_zionAutoToleranceAngle) {
@@ -44,19 +44,19 @@ class AssumeRotationDegrees : public AutoStep {
                     //set the turning speed to be positive, otherise, set it
                     //negative (due to the way the wheels align, these values are
                     //inverted)...
-                    m_zion->setDriveSpeed(m_resultingAngle > mInitalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
+                    m_zion->SetDriveSpeed(m_resultingAngle > mInitalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
                 }
                 //If we were within tolerance that iteration...
                 else {
 
                     //Stop moving, reset the wheels, clean up, and return true.
-                    m_zion->stop();
+                    m_zion->Stop();
                     return true;
                 }
             }
             else {
 
-                m_zion->setDriveSpeed();
+                m_zion->SetDriveSpeed();
             }
             return false;
         }
