@@ -23,13 +23,13 @@ class AssumeRotationDegrees : public AutoStep {
             m_targetDegreesToRotate = degreesToRotate;
         }
 
-        void _Init() {
+        void Init() {
 
-            m_initalAngle = m_navX->getAngle();
+            mInitalAngle = m_navX->getAngle();
             m_resultingAngle = m_utilityVarOne + degreesToRotate;
         }
 
-        bool _Execute() {
+        bool Execute() {
 
             //Set the wheels to their diagonal positions (at incremental 45*
             //angles found with radians converted into Nics). This works as
@@ -44,7 +44,7 @@ class AssumeRotationDegrees : public AutoStep {
                     //set the turning speed to be positive, otherise, set it
                     //negative (due to the way the wheels align, these values are
                     //inverted)...
-                    m_zion->setDriveSpeed(m_resultingAngle > m_initalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
+                    m_zion->setDriveSpeed(m_resultingAngle > mInitalAngle ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
                 }
                 //If we were within tolerance that iteration...
                 else {
@@ -61,14 +61,12 @@ class AssumeRotationDegrees : public AutoStep {
             return false;
         }
 
-        void _Cleanup() {}
-
     private:
         SwerveTrain* m_zion;
         Limelight* m_limelight;
         NavX* m_navX;
         double m_targetDegreesToRotate;
-        double m_initalAngle;
+        double mInitalAngle;
         double m_resultingAngle;
 };
 

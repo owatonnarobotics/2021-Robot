@@ -160,14 +160,14 @@ bool SwerveModule::assumeSwervePosition(const double &positionToAssume) {
     return false;
 }
 
-void SwerveModule::assumeSwerveZeroPosition() {
+bool SwerveModule::assumeSwerveZeroPosition() {
 
-    assumeSwervePosition(m_swerveZeroPosition);
+    return assumeSwervePosition(m_swerveZeroPosition);
 }
 
-void SwerveModule::assumeSwerveNearestZeroPosition() {
+bool SwerveModule::assumeSwerveNearestZeroPosition() {
 
-    assumeSwervePosition(getSwerveNearestZeroPosition());
+    return assumeSwervePosition(getSwerveNearestZeroPosition());
 }
 
 bool SwerveModule::isAtPositionWithinTolerance(const double &position) {

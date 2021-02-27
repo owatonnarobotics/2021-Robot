@@ -5,7 +5,7 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet) {
+SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet, Limelight &refLime) {
 
     m_frontRight = &frontRightModule;
     m_frontLeft = &frontLeftModule;
@@ -13,6 +13,7 @@ SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeft
     m_rearRight = &rearRightModule;
     navX = &navXToSet;
     m_recorder = &recorderToSet;
+    m_limelight = &refLime;
 }
 
 void SwerveTrain::setDriveSpeed(const double &driveSpeed) {
@@ -69,20 +70,28 @@ void SwerveTrain::setZeroPosition(const bool &verbose) {
     }
 }
 
-void SwerveTrain::assumeZeroPosition() {
+void SwerveTrain::PrintDrivePositions() {
 
-    m_frontRight->assumeSwerveZeroPosition();
-    m_frontLeft->assumeSwerveZeroPosition();
-    m_rearLeft->assumeSwerveZeroPosition();
-    m_rearRight->assumeSwerveZeroPosition();
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->getDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->getDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->getDrivePosition());
+    frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->getDrivePosition());
 }
 
-void SwerveTrain::assumeNearestZeroPosition() {
+bool SwerveTrain::assumeZeroPosition() {
 
-    m_frontRight->assumeSwerveNearestZeroPosition();
-    m_frontLeft->assumeSwerveNearestZeroPosition();
-    m_rearLeft->assumeSwerveNearestZeroPosition();
-    m_rearRight->assumeSwerveNearestZeroPosition();
+    return m_frontRight->assumeSwerveZeroPosition();
+            m_frontLeft->assumeSwerveZeroPosition();
+            m_rearLeft->assumeSwerveZeroPosition();
+            m_rearRight->assumeSwerveZeroPosition();
+}
+
+bool SwerveTrain::assumeNearestZeroPosition() {
+
+    return m_frontRight->assumeSwerveNearestZeroPosition() &&
+           m_frontLeft->assumeSwerveNearestZeroPosition() &&
+           m_rearLeft->assumeSwerveNearestZeroPosition() &&
+           m_rearRight->assumeSwerveNearestZeroPosition();
 }
 
 bool SwerveTrain::assumeTurnAroundCenterPositions() {
@@ -93,20 +102,13 @@ bool SwerveTrain::assumeTurnAroundCenterPositions() {
             m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
 }
 
-void SwerveTrain::setZionMotorsToVector(const VectorDouble &vectorToSet) {
+bool SwerveTrain::setZionMotorsToVector(VectorDouble &vectorToSet) {
 
-    m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-    m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-    m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-    m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-}
-
-bool SwerveTrain::zionMotorsAreAtVector(const VectorDouble &vectorToTest) {
-
-    return m_frontRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
-            m_frontLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
-            m_rearLeft->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest)) &&
-            m_rearRight->isAtPositionWithinTolerance(getClockwiseREVRotationsFromCenter(vectorToTest));
+    double angle = navX->getYawFull();
+    return m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
+           m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
+           m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(vectorToSet, angle)) &&
+           m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(vectorToSet, angle));
 }
 
 void SwerveTrain::publishSwervePositions() {
@@ -117,7 +119,7 @@ void SwerveTrain::publishSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
 }
 
-void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record) {
+void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record, const bool limelightLock) {
 
     double x = -rawX;
     double y = -rawY;
@@ -129,7 +131,7 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
 
     if (record) {
 
-        m_recorder->Record(rawX, rawY, rawZ);
+        m_recorder->Record(rawX, rawY, rawZ, precision, limelightLock);
     }
     else {
 
@@ -161,6 +163,29 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
     //speed of driving, and set each wheel's swerve position based on its
     //respective resulting vector.
     else {
+
+        //This if block is for driving in limelight lock mode.  This means that no
+        //matter which way we are driving, we will always be pointed at the goal.
+        if (limelightLock) {
+
+            //Turn on the limelight so that we can check if a target is found.
+            m_limelight->setLime();
+            m_limelight->setProcessing();
+
+            //Check if we are looking at a valid target...
+            if (m_limelight->getTarget()) {
+
+                //Update our rotational speed so that we turn towards the goal.
+                z = calculateLimelightLockSpeed(m_limelight->getHorizontalOffset());
+            }
+        }
+        else {
+
+            //If we want to drive normally, turn off the limelight
+            //(because it is blinding).
+            m_limelight->setLime(false);
+            m_limelight->setProcessing(false);
+        }
         
         /*
         The translation vector is the "standard" vector - that is, if no
@@ -239,29 +264,7 @@ void SwerveTrain::drive(const double rawX, const double rawY, const double rawZ,
         m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * executionCap);
     }
 }
-double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 
-    const double x = vector.i;
-    const double y = vector.j;
-    VectorDouble center(0, 1);
-    VectorDouble current(x, y);
-
-    const double dotProduct = center * current;
-    const double magnitudeProduct = center.magnitude() * current.magnitude();
-    const double cosineAngle = dotProduct / magnitudeProduct;
-    double angleRad = acos(cosineAngle);
-    if (magnitudeProduct == 0) {
-
-        angleRad = 0;
-    }
-
-    if (x < 0) {
-
-        angleRad = (2 * M_PI) - angleRad;
-    }
-    double decimalTotalCircle = ((angleRad) / (2 * M_PI));
-    return decimalTotalCircle * R_nicsConstant;
-}
 //TODO: Inline function documentation
 double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const double &y) {
 
@@ -315,4 +318,29 @@ void SwerveTrain::optimizeControllerXYToZ(const double &x, const double &y, doub
 
         z = 0;
     }
+}
+
+//Almost exactly the same function as
+//SwerveModule::calculateAssumePositionSpeed, except with constants for
+//limelight lock
+double SwerveTrain::calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
+
+    //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
+    double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(howFarRemainingInTravelInDegrees))) + 5)));
+    //If we satisfy conditions for the first linear piecewise, take that speed instead...
+    if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
+
+        toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed;
+    }
+    //Do the same for the second...
+    if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt) {
+
+        toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed;
+    }
+    //And if we needed to travel negatively to get where we need to be, make the final speed negative...
+    if (howFarRemainingInTravelInDegrees < 0) {
+
+        toReturn = -toReturn;
+    }
+    return toReturn;
 }

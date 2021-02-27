@@ -53,9 +53,6 @@ Public Methods
 
 Private Methods
 
-    double getClockwiseREVRotationsFromCenter(const VectorDouble&)
-        Same as above, but accepts a vector outright instead of stripping
-        one from the supplied controller.
     double getStandardDegreeAngleFromCenter(const double&, const double&)
         Same as above, but returns the result as a degree measure in standard
         position.
@@ -79,12 +76,13 @@ Private Methods
 #include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
-#include "Recorder.h"
+#include "auto/Recorder.h"
+#include "Limelight.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet);
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet, Limelight &refLime);
 
         void setDriveSpeed(const double &driveSpeed = 0);
         void setSwerveSpeed(const double &swerveSpeed = 0);
@@ -93,25 +91,22 @@ class SwerveTrain {
         void stop();
 
         void setZeroPosition(const bool &verbose = false);
-        void assumeZeroPosition();
-        void assumeNearestZeroPosition();
+        bool assumeZeroPosition();
+        bool assumeNearestZeroPosition();
         bool assumeTurnAroundCenterPositions();
         void publishSwervePositions();
 
-        void setZionMotorsToVector(const VectorDouble &);
-        bool zionMotorsAreAtVector(const VectorDouble &);
+        bool setZionMotorsToVector(VectorDouble &);
 
-        void drive(const double, const double, const double, const bool, const bool);
-
-        //This is very useful in accurate auto positioning, so it is
-        //overriden public, specifically for Hal pass use at a low level.
-        double getClockwiseREVRotationsFromCenter(const VectorDouble &);
+        void drive(const double, const double, const double, const bool, const bool, const bool);
+        void PrintDrivePositions();
 
     private:
         double getStandardDegreeAngleFromCenter(const double &, const double &);
         bool getControllerInDeadzone(const double, const double, const double);
         void forceControllerXYZToZeroInDeadzone(double &, double &, double &);
         void optimizeControllerXYToZ(const double &, const double &, double &);
+        double calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees);
 
     //Allow the peices of the SwerveTrain to be public for convenient
     //low-level access when needed. SwerveTrain is a great container.
@@ -124,6 +119,7 @@ class SwerveTrain {
         SwerveModule *m_rearRight;
         NavX *navX;
         Recorder* m_recorder;
+        Limelight* m_limelight;
 
         enum ZionDirections {
 

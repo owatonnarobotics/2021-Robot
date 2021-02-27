@@ -15,10 +15,16 @@
 #include "SwerveTrain.h"
 #include "auto/AutoStep.h"
 #include "auto/AutoSequence.h"
-#include "auto/steps/AssumeDirection.h"
+#include "auto/AsyncLoop.h"
+#include "auto/steps/AssumeDirectionAbsolute.h"
 #include "auto/steps/AssumeDistance.h"
 #include "auto/steps/RunPrerecorded.h"
-#include "Recorder.h"
+#include "auto/steps/SetLauncherRPM.h"
+#include "auto/steps/SetIndexSpeed.h"
+#include "auto/steps/AimLauncher.h"
+#include "auto/steps/WaitSeconds.h"
+#include "auto/steps/LimelightLock.h"
+#include "auto/Recorder.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -34,7 +40,7 @@ SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightS
 SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder, limelight);
 AutoSequence masterAuto;
 
 void Robot::RobotInit() {
@@ -55,8 +61,16 @@ void Robot::RobotInit() {
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
+    m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded", "Path A Recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
+    m_chooserAuto->SetDefaultOption("Chooser::Auto::Test Pre-recorded", "test pre-recorded");
     frc::SmartDashboard::PutData(m_chooserAuto);
+
+    m_chooserController = new frc::SendableChooser<std::string>;
+    m_chooserController->AddOption("Chooser::Controller::XboxController", "XboxController");
+    m_chooserController->SetDefaultOption("Chooser::Controller::Joystick", "Joystick");
+    frc::SmartDashboard::PutData(m_chooserController);
 
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launcher", R_launcherDefaultSpeed);
@@ -78,13 +92,54 @@ void Robot::AutonomousInit() {
     //If-We-Gotta-Do-It simply drives off the line.
     if (m_chooserAutoSelected == "dotl") {
 
-        masterAuto.AddStep(new AssumeDirection(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
         masterAuto.AddStep(new AssumeDistance(zion, 30));
     }
-    else if (m_chooserAutoSelected == "prerec") {
+    else if (m_chooserAutoSelected == "Path A Recorded") {
 
-        //masterAuto.AddStep(new AssumeDistance(zion, 30));
-        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "testingg"));
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-a"));
+    }
+    else if (m_chooserAutoSelected == "test pre-recorded") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "test"));
+    }
+    else if (m_chooserAutoSelected == "Launch Power Cells") {
+
+        masterAuto.AddStep(new SetLauncherRPM(launcher, R_launcherDefaultSpeed, false));
+        masterAuto.AddStep(new AimLauncher(launcher, limelight));
+        masterAuto.AddStep(new SetIndexSpeed(launcher, R_launcherDefaultSpeedIndex));
+        AsyncLoop* loop = new AsyncLoop;
+        loop->AddStep(new LimelightLock(zion, limelight));
+        loop->AddStep(new AimLauncher(launcher, limelight));
+        loop->AddStep(new WaitSeconds(10));
+        masterAuto.AddStep(loop);
+        
+    }
+    else if (m_chooserAutoSelected == "Path A Non-Pre-recorded") {
+
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDistance(zion, 134));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(90, 7)));
+        masterAuto.AddStep(new AssumeDistance(zion, 84.85281374));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(60, -60)));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 284));
     }
 
     masterAuto.Init();
@@ -108,6 +163,8 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
 
+    zion.PrintDrivePositions();
+
     if (playerOne->GetYButton()) {
 
         zion.setZeroPosition();
@@ -121,9 +178,15 @@ void Robot::TeleopPeriodic() {
         zion.assumeNearestZeroPosition();
     }
     else {
-    
-        zion.drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand));
-        //zion.drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1));
+        
+        if (m_chooserController->GetSelected() == "XboxController") {
+
+            zion.drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand), playerOne->GetXButton());
+        }
+        else {
+
+            zion.drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1), playerThree->GetRawButton(6));
+        }
     }
 
 
@@ -201,13 +264,18 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetBumperPressed(frc::GenericHID::kLeftHand)) {
 
-            m_servoPosition = m_servoPosition - 0.25;
+            m_servoPosition = m_servoPosition - 90;
         }
         else if (playerTwo->GetBumperPressed(frc::GenericHID::kRightHand)) {
            
-            m_servoPosition = m_servoPosition + 0.25;
+            m_servoPosition = m_servoPosition + 90;
         }
     }
+
+    /*double x = limelight.getTargetArea();
+    m_servoSpeed = -812.644 * pow(x, 6) + 7108.25 * pow(x, 5) - 24539.6 * pow(x, 4) + 41879.3 * pow(x, 3) - 35627.7 * pow(x, 2) + 12700.6 * x -679.787;
+    //frc::SmartDashboard::PutNumber("RAW SERVO POSITION", m_servoSpeed);
+    m_servoSpeed = (m_servoSpeed < 0 || m_servoSpeed > 180) ? (m_servoSpeed < 0 ? 0 : 180) : m_servoSpeed;*/
 
     //Once all layers have been evaluated, write out all of their values.
     //Doing this only once prevents weird bugs in which multiple different
@@ -219,7 +287,7 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
-    launcher.setServo(Launcher::kSetFullRange, m_servoPosition);
+    launcher.setServo(Launcher::kSetAngle, m_servoPosition);
 }
 void Robot::DisabledPeriodic() {
 

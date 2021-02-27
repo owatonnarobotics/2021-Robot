@@ -111,8 +111,8 @@ class SwerveModule {
         double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle);
 
         bool assumeSwervePosition(const double &positionToAssume);
-        void assumeSwerveZeroPosition();
-        void assumeSwerveNearestZeroPosition();
+        bool assumeSwerveZeroPosition();
+        bool assumeSwerveNearestZeroPosition();
 
         bool isAtPositionWithinTolerance(const double &position);
 

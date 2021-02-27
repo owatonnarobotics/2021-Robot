@@ -20,9 +20,9 @@ class Recorder {
             m_counter = 0;
         }
 
-        void Record(const double x, const double y, const double z) {
+        void Record(const double x, const double y, const double z, const bool precision, const bool limelightLock) {
 
-            m_log << std::setprecision(R_zionAutoControllerRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1;
+            m_log << std::setprecision(R_zionAutoControllerRecorderPrecision) << std::fixed << x + 1 << y + 1 << z + 1 << precision << limelightLock;
             SetStatus("Recording in progress...");
             m_counter++;
         }

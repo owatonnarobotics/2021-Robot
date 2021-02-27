@@ -22,7 +22,7 @@ public:
         m_limelight = &limeToSet;
     }
 
-    void _Init() {
+    void Init() {
 
         m_values.clear();
         std::ifstream valuesFile("/u/" + m_path);
@@ -34,7 +34,7 @@ public:
             oss << valuesFile.rdbuf();
             std::string stringValues = oss.str();
            // _Log(stringValues);
-            if (stringValues.length() >= R_zionAutoControllerTotalDigits * 3) {
+            if (stringValues.length() >= R_zionAutoControllerTotalDigits * 5) {
                 
                 if (stringValues.at(stringValues.length() - 1) == 'x') {
 
@@ -42,16 +42,18 @@ public:
                     int pos = 0;
                     while (!done) {
 
-                        if (stringValues.at(pos * (R_zionAutoControllerTotalDigits * 3)) == 'x') {
+                        if (stringValues.at(pos * (R_zionAutoControllerTotalDigits * 5)) == 'x') {
 
                             done = true;
                         }
                         else {
 
                             ControllerState tempState;
-                            tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3), R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3) + R_zionAutoControllerTotalDigits, R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3) + R_zionAutoControllerTotalDigits * 2, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5), R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 2, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.precision = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 3, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.limelightLock = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 4, R_zionAutoControllerTotalDigits)) - 1;
                             m_values.push_back(tempState);
                             pos++;
                         }
@@ -84,7 +86,7 @@ public:
         }
     }
 
-    bool _Execute() {
+    bool Execute() {
 
         if (!m_values.empty()) {
 
@@ -100,7 +102,7 @@ public:
                 double x = m_currentValue->x;
                 double y = m_currentValue->y;
                 double z = m_currentValue->z;
-                m_zion->drive(x, y, z, false, false);
+                m_zion->drive(x, y, z, false, false, false);
                 m_currentValue++;
                 return false;
             }
@@ -113,8 +115,6 @@ public:
         }
     }
 
-    void _Cleanup() {}
-
     void _Log(std::string message) {
 
         Log("[" + m_path + "] " + message);
@@ -125,6 +125,8 @@ public:
         double x;
         double y;
         double z;
+        bool precision;
+        bool limelightLock;
     };
 
 private:

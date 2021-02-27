@@ -13,17 +13,15 @@ class SetIndexSpeed : public AutoStep {
             m_speed = speedToSet;
         }
 
-        void _Init() {
+        void Init() {
 
             m_launcher->setIndexSpeed(m_speed);
         }
 
-        bool _Execute() {
+        bool Execute() {
 
             return true;
         }
-        
-        void _Cleanup() {}
 
     private:
         Launcher* m_launcher;

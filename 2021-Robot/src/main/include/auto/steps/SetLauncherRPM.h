@@ -14,12 +14,12 @@ class SetLauncherRPM : public AutoStep {
             m_async = async;
         }
 
-        void _Init() {
+        void Init() {
 
-            m_launcher->SetRPM(m_rpm);
+            m_launcher->setLaunchSpeed(m_rpm);
         }
 
-        bool _Execute() {
+        bool Execute() {
 
             if (m_async) {
 
@@ -27,7 +27,9 @@ class SetLauncherRPM : public AutoStep {
             }
             else {
 
-                return abs(m_launcher->GetRPM() - m_rpm) <= R_launcherSetRPMTolerance;
+                frc::Wait(5);
+                return true;
+                //return abs(m_launcher->GetRPM() - m_rpm) <= R_launcherSetRPMTolerance;
             }
         }
 

@@ -53,6 +53,10 @@ class Limelight {
 
             return table->GetNumber("tv", 0);
         }
+        bool isWithinHorizontalTolerance() {
+
+            return abs(getHorizontalOffset()) < R_zionAutoToleranceHorizontalOffset;
+        }
 
         void setProcessing(const bool &toSet = true) {
 

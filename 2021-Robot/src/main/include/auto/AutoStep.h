@@ -12,23 +12,8 @@ class AutoStep {
             m_name = name;
         }
 
-        void Init() {
-
-            //wpi::outs() << m_name << " init\n";
-            _Init();
-        }
-
-        bool Execute() {
-
-            //wpi::outs() << m_name << " execute\n";
-            return _Execute();
-        }
-
-        void Cleanup() {
-
-            //wpi::outs() << m_name << " cleanup\n";
-            _Cleanup();
-        }
+        virtual void Init() = 0;
+        virtual bool Execute() = 0;
 
         void Log(std::string message) {
 
@@ -36,10 +21,6 @@ class AutoStep {
         }
 
     private:
-        virtual void _Init() = 0;
-        virtual bool _Execute() = 0;
-        virtual void _Cleanup() = 0;
-
         std::string m_name;
 };
 

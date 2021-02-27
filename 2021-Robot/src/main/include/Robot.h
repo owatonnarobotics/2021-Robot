@@ -18,6 +18,7 @@ class Robot : public frc::TimedRobot {
 
     private:
         frc::SendableChooser<std::string> *m_chooserAuto;
+        frc::SendableChooser<std::string> *m_chooserController;
         std::string m_chooserAutoSelected;
 
         //These are used such that each speed is only set once for P2.

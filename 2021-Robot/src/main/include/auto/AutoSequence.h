@@ -10,7 +10,7 @@ class AutoSequence : public AutoStep {
     public:
         AutoSequence() : AutoStep("AutoSequence") {}
 
-        void _Init() {
+        void Init() {
 
             if (!m_steps.empty()) {
                 m_currentStep = m_steps.begin();
@@ -24,13 +24,12 @@ class AutoSequence : public AutoStep {
             }
         }
 
-        bool _Execute() {
+        bool Execute() {
 
             if (!m_done) {
                 
                 if ((*m_currentStep)->Execute()) {
 
-                    (*m_currentStep)->Cleanup();
                     if ((*m_currentStep) != m_lastStep) {
                         
                         m_currentStep++;
@@ -44,8 +43,6 @@ class AutoSequence : public AutoStep {
             }
             return m_done;
         }
-
-        void _Cleanup() {}
 
         void AddStep(AutoStep* refStep) {
 
