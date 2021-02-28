@@ -112,7 +112,7 @@ void SwerveTrain::PrintSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::Drive(const double rawX, const double rawY, const double rawZ, const bool precision, const bool record, const bool limelightLock) {
+void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision, const bool &record, const bool &limelightLock) {
 
     double x = -rawX;
     double y = -rawY;

@@ -145,7 +145,7 @@ class SwerveTrain {
          * @param record Whether or not to record the drive values
          * @param limelightLock Whether or not to drive while locked on to the Limelight target
          */
-        void Drive(const double rawX, const double rawY, const double rawZ, const bool precise, const bool record, const bool limelightLock);
+        void Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision, const bool &record, const bool &limelightLock);
 
         /**
          * Prints the positions of the drive motors to the SmartDashboard.
