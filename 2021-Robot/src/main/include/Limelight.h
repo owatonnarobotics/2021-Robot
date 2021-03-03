@@ -68,6 +68,52 @@ class Limelight {
             //According to doc, 3 is on, 1 is off, and 2 is blink.
             table->PutNumber("ledMode", toSet ? 3 : 1);
         }
+
+        //Almost exactly the same function as
+        //SwerveModule::calculateAssumePositionSpeed, except with constants for
+        //limelight lock
+        double CalculateLimelightLockSpeed() {
+
+            //This if block is for driving in limelight lock mode.  This means that no
+            //matter which way we are driving, we will always be pointed at the goal.
+            //Turn on the limelight so that we can check if a target is found.
+            setLime();
+            setProcessing();
+
+            //Check if we are looking at a valid target...
+            if (getTarget()) {
+
+                double howFarRemainingInTravelInDegrees = getHorizontalOffset();
+                //Update our rotational speed so that we turn towards the goal.
+                //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
+                double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(0.5 * howFarRemainingInTravelInDegrees))) + 5)));
+                //If we satisfy conditions for the first linear piecewise, take that speed instead...
+                if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
+
+                    toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed;
+                }
+                //Do the same for the second...
+                if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt) {
+
+                    toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed;
+                }
+                //And if we needed to travel negatively to get where we need to be, make the final speed negative...
+                if (abs(howFarRemainingInTravelInDegrees) < R_zionAutoToleranceHorizontalOffset) {
+
+                    toReturn = 0;
+                }
+                if (howFarRemainingInTravelInDegrees < 0) {
+
+                    toReturn = -toReturn;
+                }
+                return toReturn;
+            }
+            else {
+
+                return 1.0;
+            }
+        }
+
     private:
         std::shared_ptr<NetworkTable> table;
 };

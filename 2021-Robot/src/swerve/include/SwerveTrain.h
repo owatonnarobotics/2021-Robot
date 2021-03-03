@@ -34,10 +34,8 @@ class SwerveTrain {
          * @param rearLeftModule A reference to the rear left SwerveModule
          * @param rearRightModule A reference to the rear right SwerveModule
          * @param navXToSet A reference to a NavX
-         * @param recorderToSet A reference to a Recorder
-         * @param refLime A reference to a Limelight
          */
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet, Limelight &refLime);
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet);
 
         /**
          * Sets a speed to the driving motors on the train. Defaults to zero.
@@ -142,31 +140,19 @@ class SwerveTrain {
          * @param rawY The y value to drive the SwerveTrain with
          * @param rawZ The z value to drive the SwerveTrain with
          * @param precise Whether or not to drive with increased precision
-         * @param record Whether or not to record the drive values
-         * @param limelightLock Whether or not to drive while locked on to the Limelight target
          */
-        void Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision, const bool &record, const bool &limelightLock);
+        void Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision);
 
         /**
          * Prints the positions of the drive motors to the SmartDashboard.
          */
         void PrintDrivePositions();
 
-    private:
-        double CalculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees);
-
-    //Allow the peices of the SwerveTrain to be public for convenient
-    //low-level access when needed. SwerveTrain is a great container.
-    //This is primarily used for Hal, the auto driver, so he can set low-level
-    //module commands through one passed SwerveTrain.
-    public:
         SwerveModule *m_frontRight;
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
         NavX *navX;
-        Recorder* m_recorder;
-        Limelight* m_limelight;
 
 
         enum ZionDirections {

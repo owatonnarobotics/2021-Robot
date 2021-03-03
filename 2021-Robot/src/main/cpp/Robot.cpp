@@ -40,7 +40,7 @@ SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightS
 SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder, limelight);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 AutoSequence masterAuto(false);
 
 void Robot::RobotInit() {
@@ -213,15 +213,23 @@ void Robot::TeleopPeriodic() {
 
             zion.AssumeZeroPosition();
         }
-        else {
-           
-            zion.Drive(
+        if (playerOne->GetBumper(frc::GenericHID::kLeftHand)) {
+
+            recorder.Record(
                 playerOne->GetX(frc::GenericHID::kLeftHand),
                 playerOne->GetY(frc::GenericHID::kLeftHand),
                 playerOne->GetX(frc::GenericHID::kRightHand),
-                playerOne->GetBumper(frc::GenericHID::kLeftHand),
-                playerOne->GetBumper(frc::GenericHID::kRightHand),
-                playerOne->GetXButton()
+                false
+            );
+        }
+        else {
+           
+            recorder.Publish();
+            zion.Drive(
+                playerOne->GetX(frc::GenericHID::kLeftHand),
+                playerOne->GetY(frc::GenericHID::kLeftHand),
+                playerOne->GetXButton() ? limelight.CalculateLimelightLockSpeed() : playerOne->GetX(frc::GenericHID::kRightHand),
+                playerOne->GetBumper(frc::GenericHID::kLeftHand)
             );
         }
     }
@@ -239,15 +247,23 @@ void Robot::TeleopPeriodic() {
 
             zion.AssumeZeroPosition();
         }
-        else {
+        if (playerOne->GetRawButton(1)) {
 
-            zion.Drive(
+            recorder.Record(
                 playerThree->GetX(),
                 playerThree->GetY(),
                 playerThree->GetZ(),
-                playerThree->GetRawButton(5),
-                playerThree->GetRawButton(1),
-                playerThree->GetRawButton(6)
+                false
+            );
+        }
+        else {
+
+            recorder.Publish();
+            zion.Drive(
+                playerThree->GetX(),
+                playerThree->GetY(),
+                playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : playerThree->GetZ(),
+                playerThree->GetRawButton(5)
             );
         }
     }

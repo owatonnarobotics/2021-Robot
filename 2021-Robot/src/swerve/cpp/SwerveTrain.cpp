@@ -8,15 +8,13 @@
 #include "Limelight.h"
 #include "Controller.h"
 
-SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Recorder &recorderToSet, Limelight &refLime) {
+SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
 
     m_frontRight = &frontRightModule;
     m_frontLeft = &frontLeftModule;
     m_rearLeft = &rearLeftModule;
     m_rearRight = &rearRightModule;
     navX = &navXToSet;
-    m_recorder = &recorderToSet;
-    m_limelight = &refLime;
 }
 
 void SwerveTrain::SetDriveSpeed(const double &driveSpeed) {
@@ -117,7 +115,7 @@ void SwerveTrain::PrintSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision, const bool &record, const bool &limelightLock) {
+void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision) {
 
     double x = -rawX;
     double y = -rawY;
@@ -127,15 +125,6 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
     frc::SmartDashboard::PutNumber("Y", y);
     frc::SmartDashboard::PutNumber("Z", z);
 
-    if (record) {
-
-        m_recorder->Record(rawX, rawY, rawZ, precision, limelightLock);
-    }
-    else {
-    
-        m_recorder->Publish();
-    }
-
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.
     Controller::forceControllerXYZToZeroInDeadzone(x, y, z);
@@ -144,7 +133,7 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
     //Controller::optimizeControllerXYToZ(x, y, z);
 
     //If the controller is in the total deadzone (entirely still)...
-    if (!limelightLock && Controller::getControllerInDeadzone(x, y, z)) {
+    if (Controller::getControllerInDeadzone(x, y, z)) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and
@@ -161,33 +150,6 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
     //speed of driving, and set each wheel's swerve position based on its
     //respective resulting vector.
     else {
-
-        //This if block is for driving in limelight lock mode.  This means that no
-        //matter which way we are driving, we will always be pointed at the goal.
-        if (limelightLock) {
-
-            //Turn on the limelight so that we can check if a target is found.
-            m_limelight->setLime();
-            m_limelight->setProcessing();
-
-            //Check if we are looking at a valid target...
-            if (m_limelight->getTarget()) {
-
-                //Update our rotational speed so that we turn towards the goal.
-                z = CalculateLimelightLockSpeed(m_limelight->getHorizontalOffset());
-            }
-            else {
-
-                z = 1.0;
-            }
-        }
-        else {
-
-            //If we want to drive normally, turn off the limelight
-            //(because it is blinding).
-            m_limelight->setLime(false);
-            m_limelight->setProcessing(false);
-        }
         
         /*
         The translation vector is the "standard" vector - that is, if no
@@ -273,33 +235,4 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
         m_rearLeft->SetDriveSpeed(rl);
         m_rearRight->SetDriveSpeed(rr);
     }
-}
-
-//Almost exactly the same function as
-//SwerveModule::calculateAssumePositionSpeed, except with constants for
-//limelight lock
-double SwerveTrain::CalculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
-
-    //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
-    double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(0.5 * howFarRemainingInTravelInDegrees))) + 5)));
-    //If we satisfy conditions for the first linear piecewise, take that speed instead...
-    if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
-
-        toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed;
-    }
-    //Do the same for the second...
-    if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt) {
-
-        toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed;
-    }
-    //And if we needed to travel negatively to get where we need to be, make the final speed negative...
-    if (abs(howFarRemainingInTravelInDegrees) < R_zionAutoToleranceHorizontalOffset) {
-
-        toReturn = 0;
-    }
-    if (howFarRemainingInTravelInDegrees < 0) {
-
-        toReturn = -toReturn;
-    }
-    return toReturn;
 }
