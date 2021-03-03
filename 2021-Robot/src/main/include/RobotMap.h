@@ -48,7 +48,7 @@ const double R_deadzoneController = .15;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
-const double R_deadzoneControllerZ = .3;
+const double R_deadzoneControllerZ = 0.15;
 /*___End Controller Settings___*/
 
 /*_____Global Robot Variable Settigns_____*/
@@ -72,7 +72,7 @@ const double R_zionAutoMovementSpeedRotational = .2;
 const double R_zionAutoToleranceAngle = 10;
 //This is how close to zero the Limelight's horizontal target offset can be
 //in order to be considered centered.
-const double R_zionAutoToleranceHorizontalOffset = .5;
+const double R_zionAutoToleranceHorizontalOffset = .2;
 //This is the number of digits past the decimal place that will be stored when
 //being recorded.
 const int R_zionAutoControllerRecorderPrecision = 5;
@@ -102,10 +102,10 @@ const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 
 const double R_swerveTrainLimelightLockTolerance = 1;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt = 2.5;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed = .2;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt = 1.25;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed = .02;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt = 5.0;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed = .05;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt = 2.5;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed = .025;
 
 const double R_circumfrenceWheel = 4 * M_PI;
 /*___End Global Robot Variable Settings___*/

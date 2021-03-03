@@ -1,5 +1,7 @@
 #include <math.h>
 
+#include <frc/DriverStation.h>
+
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 #include "Launcher.h"
@@ -81,27 +83,30 @@ void SwerveTrain::PrintDrivePositions() {
 
 bool SwerveTrain::AssumeZeroPosition() {
 
-    return m_frontRight->AssumeSwerveZeroPosition();
-            m_frontLeft->AssumeSwerveZeroPosition();
-            m_rearLeft->AssumeSwerveZeroPosition();
-            m_rearRight->AssumeSwerveZeroPosition();
+    bool fr = m_frontRight->AssumeSwerveZeroPosition();
+    bool fl = m_frontLeft->AssumeSwerveZeroPosition();
+    bool rl = m_rearLeft->AssumeSwerveZeroPosition();
+    bool rr = m_rearRight->AssumeSwerveZeroPosition();
+    return fr && fl && rl && rr;
 }
 
 bool SwerveTrain::AssumeTurnAroundCenterPositions() {
 
-    return  m_frontRight->AssumeSwervePosition((1.0 / 8.0) * R_nicsConstant) &&
-            m_frontLeft->AssumeSwervePosition((3.0 / 8.0) * R_nicsConstant) &&
-            m_rearLeft->AssumeSwervePosition((5.0 / 8.0) * R_nicsConstant) &&
-            m_rearRight->AssumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+    bool fr = m_frontRight->AssumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
+    bool fl = m_frontLeft->AssumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
+    bool rl = m_rearLeft->AssumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
+    bool rr = m_rearRight->AssumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
+    return  fr && fl && rl && rr;
 }
 
 bool SwerveTrain::SetZionMotorsToVector(VectorDouble &vectorToSet) {
 
     double angle = navX->getYawFull();
-    return m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(vectorToSet, angle)) &&
-           m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(vectorToSet, angle)) &&
-           m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(vectorToSet, angle)) &&
-           m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(vectorToSet, angle));
+    bool fr = m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(vectorToSet, angle));
+    bool fl = m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(vectorToSet, angle));
+    bool rl = m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(vectorToSet, angle));
+    bool rr = m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(vectorToSet, angle));
+    return  fr && fl && rl && rr;
 }
 
 void SwerveTrain::PrintSwervePositions() {
@@ -127,7 +132,7 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
         m_recorder->Record(rawX, rawY, rawZ, precision, limelightLock);
     }
     else {
-
+    
         m_recorder->Publish();
     }
 
@@ -136,10 +141,10 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
     Controller::forceControllerXYZToZeroInDeadzone(x, y, z);
 
     //To prevent accidental turning, optimize Z to X and Y's magnitude.
-    Controller::optimizeControllerXYToZ(x, y, z);
+    //Controller::optimizeControllerXYToZ(x, y, z);
 
     //If the controller is in the total deadzone (entirely still)...
-    if (Controller::getControllerInDeadzone(x, y, z)) {
+    if (!limelightLock && Controller::getControllerInDeadzone(x, y, z)) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and
@@ -170,6 +175,10 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
 
                 //Update our rotational speed so that we turn towards the goal.
                 z = CalculateLimelightLockSpeed(m_limelight->getHorizontalOffset());
+            }
+            else {
+
+                z = 1.0;
             }
         }
         else {
@@ -251,10 +260,18 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
         m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(rearRightResultVector, angle));
 
         const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
-        m_frontRight->SetDriveSpeed(frontRightResultVector.magnitude() * executionCap);
-        m_frontLeft->SetDriveSpeed(frontLeftResultVector.magnitude() * executionCap);
-        m_rearLeft->SetDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
-        m_rearRight->SetDriveSpeed(rearRightResultVector.magnitude() * executionCap);
+        double fr = frontRightResultVector.magnitude() * executionCap;
+        double fl = frontLeftResultVector.magnitude() * executionCap;
+        double rl = rearLeftResultVector.magnitude() * executionCap;
+        double rr = rearRightResultVector.magnitude() * executionCap;
+        frc::SmartDashboard::PutNumber("fr", fr);
+        frc::SmartDashboard::PutNumber("fl", fl);
+        frc::SmartDashboard::PutNumber("rl", rl);
+        frc::SmartDashboard::PutNumber("rr", rr);
+        m_frontRight->SetDriveSpeed(fr);
+        m_frontLeft->SetDriveSpeed(fl);
+        m_rearLeft->SetDriveSpeed(rl);
+        m_rearRight->SetDriveSpeed(rr);
     }
 }
 
@@ -264,7 +281,7 @@ void SwerveTrain::Drive(const double &rawX, const double &rawY, const double &ra
 double SwerveTrain::CalculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
 
     //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
-    double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(howFarRemainingInTravelInDegrees))) + 5)));
+    double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(0.5 * howFarRemainingInTravelInDegrees))) + 5)));
     //If we satisfy conditions for the first linear piecewise, take that speed instead...
     if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
 
@@ -276,6 +293,10 @@ double SwerveTrain::CalculateLimelightLockSpeed(const double &howFarRemainingInT
         toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed;
     }
     //And if we needed to travel negatively to get where we need to be, make the final speed negative...
+    if (abs(howFarRemainingInTravelInDegrees) < R_zionAutoToleranceHorizontalOffset) {
+
+        toReturn = 0;
+    }
     if (howFarRemainingInTravelInDegrees < 0) {
 
         toReturn = -toReturn;

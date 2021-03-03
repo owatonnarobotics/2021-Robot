@@ -146,7 +146,7 @@ bool SwerveModule::AssumeSwervePosition(const double &positionToAssume) {
 
 bool SwerveModule::AssumeSwerveZeroPosition() {
 
-    return AssumeSwervePosition(m_swerveZeroPosition);
+    return AssumeSwervePosition(getSwerveNearestZeroPosition());
 }
 
 bool SwerveModule::IsAtPositionWithinTolerance(const double &position) {
@@ -175,4 +175,20 @@ double SwerveModule::calculateAssumePositionSpeed(const double &howFarRemainingI
         toReturn = -toReturn;
     }
     return toReturn;
+}
+
+double SwerveModule::getSwerveNearestZeroPosition() {	
+
+    //If a full rotation minus the curent position is less than half of Nic's Constant,	
+    //the position is within the second or third quadrant, so a rotation to	
+    //Nic's Constant is the fastest path...	
+    if (R_nicsConstant - GetSwervePositionSingleRotation() < (R_nicsConstant / 2)) {	
+
+        return R_nicsConstant;	
+    }	
+    //Otherwise, going to 0 from the first or second quadrant is going to be faster.	
+    else {	
+
+        return 0;	
+    }	
 }

@@ -41,7 +41,7 @@ SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwer
 SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder, limelight);
-AutoSequence masterAuto;
+AutoSequence masterAuto(false);
 
 void Robot::RobotInit() {
 
@@ -62,6 +62,7 @@ void Robot::RobotInit() {
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded", "Path A Recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded and shoot", "Path A Recorded and shoot");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
     m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Test Pre-recorded", "test pre-recorded");
@@ -76,6 +77,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launcher", R_launcherDefaultSpeed);
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
     frc::SmartDashboard::PutString("Recorder::output_file_string", "");
+    frc::SmartDashboard::PutNumber("LimelightLock end", .25);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -99,21 +101,53 @@ void Robot::AutonomousInit() {
 
         masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-a"));
     }
+    else if (m_chooserAutoSelected == "Path A Recorded and shoot") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-a"));
+        
+        AsyncLoop* spoolUp = new AsyncLoop;
+        spoolUp->AddStep(new SetLauncherRPM(launcher, R_launcherDefaultSpeed, true));
+        spoolUp->AddStep(new AimLauncher(launcher, limelight));
+        spoolUp->AddStep(new LimelightLock(zion, limelight));
+        spoolUp->AddStep(new WaitSeconds(5));
+        masterAuto.AddStep(spoolUp);
+
+        AutoSequence* indexLoop = new AutoSequence(true);
+        indexLoop->AddStep(new SetIndexSpeed(launcher, R_launcherDefaultSpeedIndex));
+        indexLoop->AddStep(new WaitSeconds(0.25));
+        indexLoop->AddStep(new SetIndexSpeed(launcher, 0.0));
+        indexLoop->AddStep(new WaitSeconds(1));
+        
+        AsyncLoop* loop = new AsyncLoop;
+        loop->AddStep(indexLoop);
+        loop->AddStep(new LimelightLock(zion, limelight));
+        loop->AddStep(new AimLauncher(launcher, limelight));
+        masterAuto.AddStep(loop);
+    }
     else if (m_chooserAutoSelected == "test pre-recorded") {
 
         masterAuto.AddStep(new RunPrerecorded(zion, limelight, "test"));
     }
     else if (m_chooserAutoSelected == "Launch Power Cells") {
 
-        masterAuto.AddStep(new SetLauncherRPM(launcher, R_launcherDefaultSpeed, false));
-        masterAuto.AddStep(new AimLauncher(launcher, limelight));
-        masterAuto.AddStep(new SetIndexSpeed(launcher, R_launcherDefaultSpeedIndex));
+        AsyncLoop* spoolUp = new AsyncLoop;
+        spoolUp->AddStep(new SetLauncherRPM(launcher, R_launcherDefaultSpeed, true));
+        spoolUp->AddStep(new AimLauncher(launcher, limelight));
+        spoolUp->AddStep(new LimelightLock(zion, limelight));
+        spoolUp->AddStep(new WaitSeconds(5));
+        masterAuto.AddStep(spoolUp);
+
+        AutoSequence* indexLoop = new AutoSequence(true);
+        indexLoop->AddStep(new SetIndexSpeed(launcher, R_launcherDefaultSpeedIndex));
+        indexLoop->AddStep(new WaitSeconds(0.25));
+        indexLoop->AddStep(new SetIndexSpeed(launcher, 0.0));
+        indexLoop->AddStep(new WaitSeconds(1));
+        
         AsyncLoop* loop = new AsyncLoop;
+        loop->AddStep(indexLoop);
         loop->AddStep(new LimelightLock(zion, limelight));
         loop->AddStep(new AimLauncher(launcher, limelight));
-        loop->AddStep(new WaitSeconds(10));
         masterAuto.AddStep(loop);
-        
     }
     else if (m_chooserAutoSelected == "Path A Non-Pre-recorded") {
 
@@ -165,30 +199,58 @@ void Robot::TeleopPeriodic() {
 
     zion.PrintDrivePositions();
 
-    if (playerOne->GetYButton()) {
+    if (m_chooserController->GetSelected() == "XboxController") {
 
-        zion.SetZeroPosition();
-    }
-    if (playerOne->GetBButton()) {
+        if (playerOne->GetYButton()) {
 
-        navX.resetYaw();
-    }
-    if (playerOne->GetAButton()) {
+            zion.SetZeroPosition();
+        }
+        if (playerOne->GetBButton()) {
 
-        zion.AssumeZeroPosition();
+            navX.resetYaw();
+        }
+        if (playerOne->GetAButton()) {
+
+            zion.AssumeZeroPosition();
+        }
+        else {
+           
+            zion.Drive(
+                playerOne->GetX(frc::GenericHID::kLeftHand),
+                playerOne->GetY(frc::GenericHID::kLeftHand),
+                playerOne->GetX(frc::GenericHID::kRightHand),
+                playerOne->GetBumper(frc::GenericHID::kLeftHand),
+                playerOne->GetBumper(frc::GenericHID::kRightHand),
+                playerOne->GetXButton()
+            );
+        }
     }
     else {
-        
-        if (m_chooserController->GetSelected() == "XboxController") {
 
-            zion.Drive(playerOne->GetX(frc::GenericHID::kLeftHand), playerOne->GetY(frc::GenericHID::kLeftHand), playerOne->GetX(frc::GenericHID::kRightHand), playerOne->GetBumper(frc::GenericHID::kLeftHand), playerOne->GetBumper(frc::GenericHID::kRightHand), playerOne->GetXButton());
+        if (playerThree->GetRawButton(3)) {
+
+            zion.SetZeroPosition();
+        }
+        if (playerThree->GetRawButton(4)) {
+
+            navX.resetYaw();
+        }
+        if (playerThree->GetRawButton(12)) {
+
+            zion.AssumeZeroPosition();
         }
         else {
 
-            zion.Drive(playerThree->GetX(), playerThree->GetY(), playerThree->GetZ(), playerThree->GetRawButton(5), playerThree->GetRawButton(1), playerThree->GetRawButton(6));
+            zion.Drive(
+                playerThree->GetX(),
+                playerThree->GetY(),
+                playerThree->GetZ(),
+                playerThree->GetRawButton(5),
+                playerThree->GetRawButton(1),
+                playerThree->GetRawButton(6)
+            );
         }
     }
-
 
     //The second controller works in control layers on top of the basic
     //driving mode engaged with function buttons. If one of the functions

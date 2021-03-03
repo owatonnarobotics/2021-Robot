@@ -17,7 +17,7 @@ class Controller {
     public:
         static bool getControllerInDeadzone(const double x, const double y, const double z) {
 
-            return abs(x) < R_deadzoneController && abs(y) < R_deadzoneController && abs(z) < R_deadzoneController;
+            return abs(x) < R_deadzoneController && abs(y) < R_deadzoneController && abs(z) < R_deadzoneControllerZ;
         }
 
         static void forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {

@@ -27,7 +27,7 @@ class SetLauncherRPM : public AutoStep {
             }
             else {
 
-                frc::Wait(5);
+                frc::Wait(7);
                 return true;
                 //return abs(m_launcher->GetRPM() - m_rpm) <= R_launcherSetRPMTolerance;
             }

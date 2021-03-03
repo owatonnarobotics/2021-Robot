@@ -34,7 +34,7 @@ public:
             oss << valuesFile.rdbuf();
             std::string stringValues = oss.str();
            // _Log(stringValues);
-            if (stringValues.length() >= R_zionAutoControllerTotalDigits * 5) {
+            if (stringValues.length() >= R_zionAutoControllerTotalDigits * 3) {
                 
                 if (stringValues.at(stringValues.length() - 1) == 'x') {
 
@@ -42,18 +42,18 @@ public:
                     int pos = 0;
                     while (!done) {
 
-                        if (stringValues.at(pos * (R_zionAutoControllerTotalDigits * 5)) == 'x') {
+                        if (stringValues.at(pos * (R_zionAutoControllerTotalDigits * 3)) == 'x') {
 
                             done = true;
                         }
                         else {
 
                             ControllerState tempState;
-                            tempState.x = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5), R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.y = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits, R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.z = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 2, R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.precision = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 3, R_zionAutoControllerTotalDigits)) - 1;
-                            tempState.limelightLock = std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 4, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.x =               std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3), R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.y =               std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3) + R_zionAutoControllerTotalDigits, R_zionAutoControllerTotalDigits)) - 1;
+                            tempState.z =               std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 3) + R_zionAutoControllerTotalDigits * 2, R_zionAutoControllerTotalDigits)) - 1;
+                            /*tempState.precision =       std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 3, R_zionAutoControllerTotalDigits)) == 1.0;
+                            tempState.limelightLock =   std::stod(stringValues.substr(pos * (R_zionAutoControllerTotalDigits * 5) + R_zionAutoControllerTotalDigits * 4, R_zionAutoControllerTotalDigits)) == 1.0;*/
                             m_values.push_back(tempState);
                             pos++;
                         }
@@ -102,6 +102,8 @@ public:
                 double x = m_currentValue->x;
                 double y = m_currentValue->y;
                 double z = m_currentValue->z;
+                /*bool precision = m_currentValue->precision;
+                bool limelightLock = m_currentValue->limelightLock;*/
                 m_zion->Drive(x, y, z, false, false, false);
                 m_currentValue++;
                 return false;

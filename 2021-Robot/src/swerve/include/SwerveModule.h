@@ -181,6 +181,7 @@ class SwerveModule {
          * @return The speed
          */
         double calculateAssumePositionSpeed(const double &howFarRemainingInTravel);
+        double getSwerveNearestZeroPosition();
 
         rev::CANSparkMax *m_driveMotor;
         rev::CANEncoder *m_driveMotorEncoder;

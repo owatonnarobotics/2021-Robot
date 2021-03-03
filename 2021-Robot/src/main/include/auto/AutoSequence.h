@@ -8,7 +8,10 @@
 class AutoSequence : public AutoStep {
 
     public:
-        AutoSequence() : AutoStep("AutoSequence") {}
+        AutoSequence(const bool &loop) : AutoStep("AutoSequence") {
+
+            m_loop = loop;
+        }
 
         void Init() {
 
@@ -28,16 +31,32 @@ class AutoSequence : public AutoStep {
 
             if (!m_done) {
                 
+                // If the current step has finished
                 if ((*m_currentStep)->Execute()) {
 
-                    if ((*m_currentStep) != m_lastStep) {
+                    // If the step that just finished is the last step
+                    if ((*m_currentStep) == m_lastStep) {
                         
-                        m_currentStep++;
-                        (*m_currentStep)->Init();
+                        // If we should loop
+                        if (m_loop) {
+                            
+                            // Set the current step to the first step
+                            m_currentStep = m_steps.begin();
+                            // Initialize the first step
+                            (*m_currentStep)->Init();
+                        }
+                        else {
+
+                            // If we shouldn't loop, this AutoSequence is done
+                            m_done = false;
+                        }
                     }
                     else {
-                        
-                        m_done = true;
+
+                        // Move on to the next step
+                        m_currentStep++;
+                        // Initialize the next step
+                        (*m_currentStep)->Init();
                     }
                 }
             }
@@ -59,6 +78,7 @@ class AutoSequence : public AutoStep {
         std::vector<AutoStep*>::iterator m_currentStep;
         AutoStep* m_lastStep;
         bool m_done;
+        bool m_loop;
 };
 
 #endif

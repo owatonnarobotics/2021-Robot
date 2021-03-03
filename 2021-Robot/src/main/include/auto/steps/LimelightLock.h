@@ -8,7 +8,11 @@
 class LimelightLock : public AutoStep {
 
     public:
-        LimelightLock(SwerveTrain &refZion, Limelight &refLime) : AutoStep("LimelightLock") {}
+        LimelightLock(SwerveTrain &refZion, Limelight &refLime) : AutoStep("LimelightLock") {
+
+            m_zion = &refZion;
+            m_limelight = &refLime;
+        }
 
         void Init() {}
 
