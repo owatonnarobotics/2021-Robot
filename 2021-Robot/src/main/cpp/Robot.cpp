@@ -13,6 +13,9 @@
 #include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
+#include "Controller.h"
+
+// Auto
 #include "auto/AutoStep.h"
 #include "auto/AutoSequence.h"
 #include "auto/AsyncLoop.h"
@@ -62,6 +65,7 @@ void Robot::RobotInit() {
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded", "Path A Recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Path B Recorded", "Path B Recorded");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded and shoot", "Path A Recorded and shoot");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
     m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
@@ -100,6 +104,10 @@ void Robot::AutonomousInit() {
     else if (m_chooserAutoSelected == "Path A Recorded") {
 
         masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-a"));
+    }
+    else if (m_chooserAutoSelected == "Path B Recorded") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-b"));
     }
     else if (m_chooserAutoSelected == "Path A Recorded and shoot") {
 
@@ -150,7 +158,7 @@ void Robot::AutonomousInit() {
         masterAuto.AddStep(loop);
     }
     else if (m_chooserAutoSelected == "Path A Non-Pre-recorded") {
-
+    
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
         masterAuto.AddStep(new AssumeDistance(zion, 134));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
@@ -159,7 +167,7 @@ void Robot::AutonomousInit() {
         masterAuto.AddStep(new AssumeDistance(zion, 53));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
         masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(90, 7)));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(143, 7)));
         masterAuto.AddStep(new AssumeDistance(zion, 84.85281374));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
         masterAuto.AddStep(new AssumeDistance(zion, 53));
@@ -199,6 +207,24 @@ void Robot::TeleopPeriodic() {
 
     zion.PrintDrivePositions();
 
+    double x;
+    double y;
+    double z;
+    if (m_chooserController->GetSelected() == "XboxController") {
+        
+        x = playerOne->GetX(frc::GenericHID::kLeftHand);
+        y = playerOne->GetY(frc::GenericHID::kLeftHand);
+        z = playerOne->GetX(frc::GenericHID::kRightHand);
+    }
+    else {
+
+        x = playerThree->GetX();
+        y = playerThree->GetY();
+        z = playerThree->GetZ();
+    }
+
+    Controller::forceControllerXYZToZeroInDeadzone(x, y, z);
+
     if (m_chooserController->GetSelected() == "XboxController") {
 
         if (playerOne->GetYButton()) {
@@ -213,24 +239,22 @@ void Robot::TeleopPeriodic() {
 
             zion.AssumeZeroPosition();
         }
-        if (playerOne->GetBumper(frc::GenericHID::kLeftHand)) {
+        else {
 
-            recorder.Record(
-                playerOne->GetX(frc::GenericHID::kLeftHand),
-                playerOne->GetY(frc::GenericHID::kLeftHand),
-                playerOne->GetX(frc::GenericHID::kRightHand),
-                false
+            zion.Drive(
+                x,
+                y,
+                playerOne->GetBumper(frc::GenericHID::kLeftHand) ? limelight.CalculateLimelightLockSpeed() : z,
+                playerOne->GetBumper(frc::GenericHID::kLeftHand)
             );
+        }
+        if (playerOne->GetXButton()) {
+
+            recorder.Record(x, y, z, false);
         }
         else {
            
             recorder.Publish();
-            zion.Drive(
-                playerOne->GetX(frc::GenericHID::kLeftHand),
-                playerOne->GetY(frc::GenericHID::kLeftHand),
-                playerOne->GetXButton() ? limelight.CalculateLimelightLockSpeed() : playerOne->GetX(frc::GenericHID::kRightHand),
-                playerOne->GetBumper(frc::GenericHID::kLeftHand)
-            );
         }
     }
     else {
@@ -247,24 +271,22 @@ void Robot::TeleopPeriodic() {
 
             zion.AssumeZeroPosition();
         }
-        if (playerOne->GetRawButton(1)) {
+        else {
 
-            recorder.Record(
-                playerThree->GetX(),
-                playerThree->GetY(),
-                playerThree->GetZ(),
-                false
+            zion.Drive(
+                x,
+                y,
+                playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : z,
+                playerThree->GetRawButton(5)
             );
+        }
+        if (playerThree->GetRawButton(1)) {
+
+            recorder.Record(x, y, z, false);
         }
         else {
 
             recorder.Publish();
-            zion.Drive(
-                playerThree->GetX(),
-                playerThree->GetY(),
-                playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : playerThree->GetZ(),
-                playerThree->GetRawButton(5)
-            );
         }
     }
 
@@ -350,10 +372,9 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    /*double x = limelight.getTargetArea();
-    m_servoSpeed = -812.644 * pow(x, 6) + 7108.25 * pow(x, 5) - 24539.6 * pow(x, 4) + 41879.3 * pow(x, 3) - 35627.7 * pow(x, 2) + 12700.6 * x -679.787;
-    //frc::SmartDashboard::PutNumber("RAW SERVO POSITION", m_servoSpeed);
-    m_servoSpeed = (m_servoSpeed < 0 || m_servoSpeed > 180) ? (m_servoSpeed < 0 ? 0 : 180) : m_servoSpeed;*/
+    double area = limelight.getTargetArea();
+    m_servoPosition = -812.644 * pow(area, 6) + 7108.25 * pow(area, 5) - 24539.6 * pow(area, 4) + 41879.3 * pow(area, 3) - 35627.7 * pow(area, 2) + 12700.6 * area -679.787;
+    m_servoPosition = (m_servoPosition < 0 || m_servoPosition > 180) ? (m_servoPosition < 0 ? 0 : 180) : m_servoPosition;
 
     //Once all layers have been evaluated, write out all of their values.
     //Doing this only once prevents weird bugs in which multiple different

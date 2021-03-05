@@ -1,4 +1,5 @@
 #include <math.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "SwerveModule.h"
 
@@ -109,9 +110,14 @@ double SwerveModule::AbsoluteVectorToNics(VectorDouble &vector, const double &an
     return R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.;
 }
 
-bool SwerveModule::AssumeSwervePosition(const double &positionToAssume) {
+bool SwerveModule::AssumeSwervePosition(const double &positionToAssumeRaw) {
 
     double currentPosition = GetSwervePositionSingleRotation();
+    double positionToAssume = fmod(positionToAssumeRaw, R_nicsConstant);
+
+    
+
+    frc::SmartDashboard::PutNumber("ASP", abs(abs(fmod(abs(positionToAssume - GetSwervePositionSingleRotation()), R_nicsConstant) - R_nicsConstant / 2) - R_nicsConstant / 2));
 
     //If the current position is close enough to where we want to go (within one tolerance value)...
     if (IsAtPositionWithinTolerance(positionToAssume)) {
@@ -120,7 +126,7 @@ bool SwerveModule::AssumeSwervePosition(const double &positionToAssume) {
         m_swerveMotor->Set(0);
         return true;
     }
-    //If the position to assume is greater than half a revolution in the clockwise direction...
+    //If the position to assume is greater than half a revolution...
     else if (abs(positionToAssume - currentPosition) > R_nicsConstant / 2) {
 
         //If such a rotation needs to be clockwise...
@@ -152,14 +158,14 @@ bool SwerveModule::AssumeSwerveZeroPosition() {
 bool SwerveModule::IsAtPositionWithinTolerance(const double &position) {
 
     //If the current position is close enough to where we want to go (within one tolerance value)...
-    return abs(position - GetSwervePositionSingleRotation()) < R_swerveTrainAssumePositionTolerance;
+    return abs(abs(fmod(abs(position - GetSwervePositionSingleRotation()), R_nicsConstant) - R_nicsConstant / 2) - R_nicsConstant / 2) < R_swerveTrainAssumePositionTolerance;
 }
 
 double SwerveModule::calculateAssumePositionSpeed(const double &howFarRemainingInTravel) {
 
     //Begin initally with a double calculated with the simplex function...
     double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravel)) + 5)));
-    //If we satisfy conditions for the first linear piecewise, take that speed instead...
+    //If we satisfy conditions for the first linear piecewiseposition, take that speed instead...
     if (abs(howFarRemainingInTravel) < R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt) {
 
         toReturn = R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed;

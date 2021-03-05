@@ -141,7 +141,7 @@ class SwerveTrain {
          * @param rawZ The z value to drive the SwerveTrain with
          * @param precise Whether or not to drive with increased precision
          */
-        void Drive(const double &rawX, const double &rawY, const double &rawZ, const bool &precision);
+        void Drive(const double &x, const double &y, const double &z, const bool &precision);
 
         /**
          * Prints the positions of the drive motors to the SmartDashboard.

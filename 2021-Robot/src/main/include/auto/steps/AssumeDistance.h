@@ -36,7 +36,7 @@ class AssumeDistance : public AutoStep {
             //used as a tolerance)...
             frc::SmartDashboard::PutNumber("END ACTUAL", m_zion->m_frontRight->GetDrivePosition());
             double delta = m_targetEncoderPosition - m_zion->m_frontRight->GetDrivePosition();
-            if (delta > R_kuhnsConstant * .25) {
+            if (abs(delta) > R_kuhnsConstant * .1) {
 
                 m_zion->SetDriveSpeed(.15);
                 //If we made it to here, we didn't succeed, so return false for

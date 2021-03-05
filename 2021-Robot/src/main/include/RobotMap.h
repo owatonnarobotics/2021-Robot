@@ -95,7 +95,7 @@ const double R_angleFromCenterToRearRightWheel = 225.;
 
 //These contants are used for the functions which provide assuming a position.
 //See those functions for further detail.
-const double R_swerveTrainAssumePositionTolerance = .1;
+const double R_swerveTrainAssumePositionTolerance = .25;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;

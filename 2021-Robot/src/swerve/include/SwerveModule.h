@@ -145,7 +145,7 @@ class SwerveModule {
          * @param positionToAssume The position to set the swerve module to
          * @return Whether or not the swerve module is at the position
          */
-        bool AssumeSwervePosition(const double &positionToAssume);
+        bool AssumeSwervePosition(const double &positionToAssumeRaw);
 
         /**
          * Drives the swerve to the current value of the swerve's zero position
