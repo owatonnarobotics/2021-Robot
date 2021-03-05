@@ -50,7 +50,7 @@ void Robot::RobotInit() {
 
     playerOne = new frc::XboxController(R_controllerPortPlayerOne);
     playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
-    playerThree = new frc::Joystick(2);
+    playerThree = new frc::Joystick(R_controllerPortPlayerThree);
 
     m_booleanClimberLock    = true;
     m_speedClimberClimb     = 0;
