@@ -26,7 +26,7 @@ class AssumeRotationDegrees : public AutoStep {
         void _Init() {
 
             m_initalAngle = m_navX->getAngle();
-            m_resultingAngle = m_utilityVarOne + degreesToRotate;
+            m_resultingAngle = m_initalAngle + m_targetDegreesToRotate;
         }
 
         bool _Execute() {

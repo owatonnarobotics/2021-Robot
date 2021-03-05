@@ -18,8 +18,10 @@
 #include "auto/AutoSequence.h"
 #include "auto/steps/AssumeDirection.h"
 #include "auto/steps/AssumeDistance.h"
+#include "auto/steps/AssumeRotationDegrees.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "Recorder.h"
+#include "Vision.h"
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
@@ -36,6 +38,7 @@ SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, recorder);
 AutoSequence masterAuto;
+Vision cameraData;
 
 void Robot::RobotInit() {
 
@@ -53,6 +56,7 @@ void Robot::RobotInit() {
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
+    m_chooserAuto->AddOption("Chooser::Auto::Galactic-Search", "search");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Run-PreRecorded", "prerec");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
@@ -83,6 +87,22 @@ void Robot::AutonomousInit() {
 
         //masterAuto.AddStep(new AssumeDistance(zion, 30));
         masterAuto.AddStep(new RunPrerecorded(zion, limelight, "testingg"));
+    }
+    else if (m_chooserAutoSelected == "search"){
+
+        //Code for movement in Galactic Search to be added here:
+        cv::VideoCapture cap;
+
+        cv::Mat frame;  //Initializing the image being manipulated by OpenCV 
+        cap >> frame;   //Setting the image to the video capture
+
+        double degreesToTurnRound = cameraData.degreesToTurn(frame);
+
+        masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
+
+        //A wait step here might be nice here, to check out aiming. Needs up-to-date #include though.
+        //masterAuto.AddStep(new AssumeDirection(zion, SwerveTrain::ZionDirections::kForward));
+        //masterAuto.AddStep(new AssumeDistance(zion, 30));
     }
 
     masterAuto.Init();
