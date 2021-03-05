@@ -300,46 +300,41 @@ void Robot::TeleopPeriodic() {
     //with no execution caps or impediments. Overrides all other layers.
     if (playerTwo->GetBackButton()) {
 
-        m_booleanClimberLock = false;
-        m_speedClimberClimb = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
-        m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
-        m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        m_speedLauncherIndex = -playerTwo->GetY(frc::GenericHID::kLeftHand);
-        m_speedLauncherLaunch = -playerTwo->GetY(frc::GenericHID::kRightHand);
+        m_booleanClimberLock =      false;
+        m_speedClimberClimb =       -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedClimberTranslate =    playerTwo->GetX(frc::GenericHID::kLeftHand);
+        m_speedClimberWheel =        playerTwo->GetX(frc::GenericHID::kRightHand);
+        m_speedIntake =             -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedLauncherIndex =      -playerTwo->GetY(frc::GenericHID::kLeftHand);
+        m_speedLauncherLaunch =     -playerTwo->GetY(frc::GenericHID::kRightHand);
     }
     else {
 
-        m_booleanClimberLock = true;
-        m_speedClimberClimb = 0;
-        m_speedClimberTranslate = 0;
-        m_speedClimberWheel = 0;
-        m_speedIntake = 0;
-        m_speedLauncherIndex = 0;
-        m_speedLauncherLaunch = 0;
+        m_booleanClimberLock =      true;
+        m_speedClimberClimb =       0;
+        m_speedClimberTranslate =   0;
+        m_speedClimberWheel =       0;
+        m_speedIntake =             0;
+        m_speedLauncherIndex =      0;
+        m_speedLauncherLaunch =     0;
     }
 
     //The start button is "climber" control layer. Controls nothing but the
     //climber. Overrides the auto layer.
     if (!playerTwo->GetBackButton() && playerTwo->GetStartButton()) {
 
-        m_speedClimberClimb = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
-        m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
-        m_booleanClimberLock = !playerTwo->GetBumper(frc::GenericHID::kRightHand);
+        m_speedClimberClimb =       -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedClimberTranslate =    playerTwo->GetX(frc::GenericHID::kLeftHand);
+        m_speedClimberWheel =        playerTwo->GetX(frc::GenericHID::kRightHand);
+        m_booleanClimberLock =      !playerTwo->GetBumper(frc::GenericHID::kRightHand);
     }
     else {
 
-        m_speedClimberClimb = 0;
-        m_speedClimberTranslate = 0;
-        m_speedClimberWheel = 0;
-        m_booleanClimberLock = true;
+        m_speedClimberClimb =       0;
+        m_speedClimberTranslate =   0;
+        m_speedClimberWheel =       0;
+        m_booleanClimberLock =      true;
     }
-
-    //The center button is the "auto" control layer. Enables auto functions.
-    //Overrides regular driving, but is overriden by all other layers.
-    if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && playerTwo->GetRawButton(9)) {}
-    else {}
 
     //If no layers were engaged, regular driving can begin.
     if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && !playerTwo->GetRawButton(9)) {
@@ -372,6 +367,8 @@ void Robot::TeleopPeriodic() {
         }
     }
 
+    // Sets the servos to a position based on a quintic regression model with
+    // respect to the area detected by the limelight
     double area = limelight.getTargetArea();
     m_servoPosition = -812.644 * pow(area, 6) + 7108.25 * pow(area, 5) - 24539.6 * pow(area, 4) + 41879.3 * pow(area, 3) - 35627.7 * pow(area, 2) + 12700.6 * area -679.787;
     m_servoPosition = (m_servoPosition < 0 || m_servoPosition > 180) ? (m_servoPosition < 0 ? 0 : 180) : m_servoPosition;
