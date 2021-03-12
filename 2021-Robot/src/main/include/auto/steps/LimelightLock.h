@@ -18,7 +18,7 @@ class LimelightLock : public AutoStep {
 
         bool Execute() {
 
-            m_zion->Drive(0, 0, m_limelight->CalculateLimelightLockSpeed(), false);
+            m_zion->Drive(0, 0, m_limelight->CalculateLimelightLockSpeed(), false, false, false);
             return m_limelight->isWithinHorizontalTolerance();
         }
 

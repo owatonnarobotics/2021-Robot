@@ -23,6 +23,7 @@ Public Methods
 
 #include "RobotMap.h"
 #include <frc/Servo.h>
+#include <frc/Victor.h>
 
 class Launcher {
 
@@ -80,5 +81,5 @@ class Launcher {
         rev::CANSparkMax *launchMotorOne;
         rev::CANSparkMax *launchMotorTwo;
         frc::Servo *rightServo;
-        frc::Servo *leftServo; 
+        frc::Servo *leftServo;
 };

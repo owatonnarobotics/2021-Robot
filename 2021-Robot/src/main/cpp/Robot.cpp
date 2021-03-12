@@ -65,9 +65,12 @@ void Robot::RobotInit() {
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded", "Path A Recorded");
-    m_chooserAuto->AddOption("Chooser::Auto::Path B Recorded", "Path B Recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");+
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded and shoot", "Path A Recorded and shoot");
-    m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::Path B Recorded", "Path B Recorded");
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Barrel Racing Path", "brp")
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Slalom Path", "sp")
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Bounce Path", "bp")
     m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Test Pre-recorded", "test pre-recorded");
     frc::SmartDashboard::PutData(m_chooserAuto);
@@ -99,15 +102,11 @@ void Robot::AutonomousInit() {
     if (m_chooserAutoSelected == "dotl") {
 
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
-        masterAuto.AddStep(new AssumeDistance(zion, 30));
+        masterAuto.AddStep(new AssumeDistance(zion, 30, SwerveTrain::ZionDirections::kLeft));
     }
     else if (m_chooserAutoSelected == "Path A Recorded") {
 
         masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-a"));
-    }
-    else if (m_chooserAutoSelected == "Path B Recorded") {
-
-        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-b"));
     }
     else if (m_chooserAutoSelected == "Path A Recorded and shoot") {
 
@@ -132,9 +131,48 @@ void Robot::AutonomousInit() {
         loop->AddStep(new AimLauncher(launcher, limelight));
         masterAuto.AddStep(loop);
     }
-    else if (m_chooserAutoSelected == "test pre-recorded") {
+    else if (m_chooserAutoSelected == "Path A Non-Pre-recorded") {
+    
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDistance(zion, 134, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(143, 7)));
+        masterAuto.AddStep(new AssumeDistance(zion, 143, new VectorDouble(143, 7)));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kBackward));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(60, -60)));
+        masterAuto.AddStep(new AssumeDistance(zion, 84.85281374, new VectorDouble(60, -60)));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kRight));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDistance(zion, 53, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
+        masterAuto.AddStep(new AssumeDistance(zion, 284, SwerveTrain::ZionDirections::kLeft));
+    }
+    else if (m_chooserAutoSelected == "Path B Recorded") {
 
-        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "test"));
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "path-b"));
+    }
+    else if (m_chooserAutoSelected == "brp") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "brp"));
+    }
+    else if (m_chooserAutoSelected == "sp") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "sp"));
+    }
+    else if (m_chooserAutoSelected == "bp") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "bp"));
     }
     else if (m_chooserAutoSelected == "Launch Power Cells") {
 
@@ -157,31 +195,9 @@ void Robot::AutonomousInit() {
         loop->AddStep(new AimLauncher(launcher, limelight));
         masterAuto.AddStep(loop);
     }
-    else if (m_chooserAutoSelected == "Path A Non-Pre-recorded") {
-    
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
-        masterAuto.AddStep(new AssumeDistance(zion, 134));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(143, 7)));
-        masterAuto.AddStep(new AssumeDistance(zion, 84.85281374));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kBackward));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, new VectorDouble(60, -60)));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kRight));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
-        masterAuto.AddStep(new AssumeDistance(zion, 53));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
-        masterAuto.AddStep(new AssumeDistance(zion, 284));
+    else if (m_chooserAutoSelected == "test pre-recorded") {
+
+        masterAuto.AddStep(new RunPrerecorded(zion, limelight, "test"));
     }
 
     masterAuto.Init();
@@ -204,7 +220,7 @@ void Robot::TeleopInit() {
     zion.SetDriveBrake(true);
 }
 void Robot::TeleopPeriodic() {
-
+    
     zion.PrintDrivePositions();
 
     double x;
@@ -242,10 +258,12 @@ void Robot::TeleopPeriodic() {
         else {
 
             zion.Drive(
-                x,
-                y,
+                -x,
+                -y,
                 playerOne->GetBumper(frc::GenericHID::kLeftHand) ? limelight.CalculateLimelightLockSpeed() : z,
-                playerOne->GetBumper(frc::GenericHID::kLeftHand)
+                playerOne->GetBumper(frc::GenericHID::kLeftHand),
+                false,
+                false
             );
         }
         if (playerOne->GetXButton()) {
@@ -274,10 +292,12 @@ void Robot::TeleopPeriodic() {
         else {
 
             zion.Drive(
-                x,
-                y,
+                -x,
+                -y,
                 playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : z,
-                playerThree->GetRawButton(5)
+                playerThree->GetRawButton(5),
+                playerThree->GetRawButton(7),
+                false
             );
         }
         if (playerThree->GetRawButton(1)) {

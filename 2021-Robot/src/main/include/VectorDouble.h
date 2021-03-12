@@ -25,70 +25,89 @@ Public Methods:
 
 struct VectorDouble {
 
-        VectorDouble(const double &iVal, const double &jVal) {
+    VectorDouble(const double &iVal, const double &jVal) {
 
-            i = iVal;
-            j = jVal;
+        i = iVal;
+        j = jVal;
+    }
+
+    double operator* (VectorDouble const &otherVector) {
+
+        return ((i * otherVector.i) + (j * otherVector.j));
+    }
+    VectorDouble operator+ (VectorDouble const &otherVector) {
+
+        VectorDouble resultVector (i + otherVector.i, j + otherVector.j);
+        return resultVector;
+    }
+
+    VectorDouble* toStandard() {
+
+        VectorDouble* result = new VectorDouble(0, 0);
+        if (abs(i) >= abs(j)) {
+
+            result->i = 1.0;
+            result->j = j / i;
         }
+        else {
 
-        double operator* (VectorDouble const &otherVector) {
-
-            return ((i * otherVector.i) + (j * otherVector.j));
+            result->i = i / j;
+            result->j = 1.0;
         }
-        VectorDouble operator+ (VectorDouble const &otherVector) {
+        if (i < 0) result->i *= -1;
+        if (j < 0) result->j *= -1;
 
-            VectorDouble resultVector (i + otherVector.i, j + otherVector.j);
-            return resultVector;
+        return result;
+    }
+
+    double magnitude() {
+
+        return sqrt(pow(i, 2) + pow(j, 2));
+    }
+    //TODO: Inline function documentation
+    double unitCircleAngleDeg() {
+
+        double calculatedAngle = 0;
+
+        //Quadrant I
+        if (i > 0 && j > 0) {
+
+            calculatedAngle = atan(j / i) * (180 / M_PI);
         }
+        //Quadrant II
+        else if (i < 0 && j > 0) {
 
-        double magnitude() {
-
-            return sqrt(pow(i, 2) + pow(j, 2));
+            calculatedAngle = 180 - atan(j / -i) * (180 / M_PI);
         }
-        //TODO: Inline function documentation
-        double unitCircleAngleDeg() {
+        //Quadrant III
+        else if (i < 0 && j < 0) {
 
-            double calculatedAngle = 0;
-
-            //Quadrant I
-            if (i > 0 && j > 0) {
-
-                calculatedAngle = atan(j / i) * (180 / M_PI);
-            }
-            //Quadrant II
-            else if (i < 0 && j > 0) {
-
-                calculatedAngle = 180 - atan(j / -i) * (180 / M_PI);
-            }
-            //Quadrant III
-            else if (i < 0 && j < 0) {
-
-                calculatedAngle = 180 + atan(-j / -i) * (180 / M_PI);
-            }
-            //Quadrant IV
-            else if (i > 0 && j < 0) {
-
-                calculatedAngle = 360 - atan(-j / i) * (180 / M_PI);
-            }
-            else if (i == 0 && j > 0) {
-
-                calculatedAngle = 90;
-            }
-            else if (i == 0 && j < 0) {
-
-                calculatedAngle = 270;
-            }
-            else if (i > 0 && j == 0) {
-
-                calculatedAngle = 0;
-            }
-            else if (i < 0 && j == 0) {
-
-                calculatedAngle = 180;
-            }
-            return calculatedAngle;
+            calculatedAngle = 180 + atan(-j / -i) * (180 / M_PI);
         }
+        //Quadrant IV
+        else if (i > 0 && j < 0) {
 
-        double i;
-        double j;
+            calculatedAngle = 360 - atan(-j / i) * (180 / M_PI);
+        }
+        else if (i == 0 && j > 0) {
+
+            calculatedAngle = 90;
+        }
+        else if (i == 0 && j < 0) {
+
+            calculatedAngle = 270;
+        }
+        else if (i > 0 && j == 0) {
+
+            calculatedAngle = 0;
+        }
+        else if (i < 0 && j == 0) {
+
+            calculatedAngle = 180;
+        }
+        return calculatedAngle;
+    }
+
+    double i;
+    double j;
 };

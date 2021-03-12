@@ -116,89 +116,105 @@ void SwerveTrain::PrintSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::Drive(const double &x, const double &y, const double &z, const bool &precision) {
+void SwerveTrain::Drive(const double &x, const double &y, const double &z, const bool &precision, const bool &relative, const bool &hold) {
 
-    /*
-    The translation vector is the "standard" vector - that is, if no
-    rotation were applied, the robot would simply travel in the direction
-    of this vector. In order to obtain this, we need the X and Y from the
-    controller in addition to input from a gyroscope. This is due to the
-    fact that pushing straight on the controller should always make it
-    drive directly away from the operator, and simply driving "straight" at
-    a 45* angle would make it drive away from the operator at 45*. This is
-    true of any angle, so the gyro is needed to offset the vector described
-    by X and Y. VectorDouble translationVector(0, 0);
-    */
-    //TODO: why inverted?
-    VectorDouble translationVector(-x, y);
+    if (x == 0 && y == 0 && z == 0) {
 
-    //Get the navX yaw angle for computing the field-oriented angle
-    double angle = navX->getYawFull();
+        Stop();
+    }
+    else {
 
-    /*
-    The rotational vectors are found by multiplying the controller's
-    rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the
-    position we put the wheels in so that it can turn, with zero at the
-    top) minus the number of degrees we are offset from 0.  Then, for the j
-    value we do the same, except we use sine, for Y.  All angles passed as
-    paramaters to cos() and sin() are converted to radians first.
-    */
-    VectorDouble frontRightRotationVector (
+        /*
+        The translation vector is the "standard" vector - that is, if no
+        rotation were applied, the robot would simply travel in the direction
+        of this vector. In order to obtain this, we need the X and Y from the
+        controller in addition to input from a gyroscope. This is due to the
+        fact that pushing straight on the controller should always make it
+        drive directly away from the operator, and simply driving "straight" at
+        a 45* angle would make it drive away from the operator at 45*. This is
+        true of any angle, so the gyro is needed to offset the vector described
+        by X and Y. VectorDouble translationVector(0, 0);
+        */
+        //TODO: why inverted?
+        VectorDouble translationVector(-x, y);
 
-        z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180))
-    );
+        //Get the navX yaw angle for computing the field-oriented
+        //angle only if field oriented
+        double angle;
+        if (relative) {
 
-    VectorDouble frontLeftRotationVector (
+            angle = 0;
+        }
+        else {
+            
+            angle = navX->getYawFull();
+        }
 
-        z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180))
-    );
+        /*
+        The rotational vectors are found by multiplying the controller's
+        rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the
+        position we put the wheels in so that it can turn, with zero at the
+        top) minus the number of degrees we are offset from 0.  Then, for the j
+        value we do the same, except we use sine, for Y.  All angles passed as
+        paramaters to cos() and sin() are converted to radians first.
+        */
+        VectorDouble frontRightRotationVector (
 
-    VectorDouble rearLeftRotationVector (
+            z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
+            z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180))
+        );
 
-        z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180))
-    );
+        VectorDouble frontLeftRotationVector (
 
-    VectorDouble rearRightRotationVector (
+            z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
+            z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180))
+        );
 
-        z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180))
-    );
+        VectorDouble rearLeftRotationVector (
 
-    /*
-    And the vector we actually want to apply to the swerves is the sum of
-    the two vectors - the vector that forms "straight" (translationVector)
-    and the vector that forms strictly the rotation (rotationVector).
-    */
-    VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
-    VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
-    VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
-    VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
+            z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
+            z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180))
+        );
 
-    /*
-    Here, all of the resulting vectors are converted into Nics so that they
-    can be written to the swerve modules using AssumeSwervePosition(). They
-    were in degrees before to enable the use of common trigonomoetry. We
-    get Nics from degrees by calling getSwerveRotatingPosition().
-    */
-    m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(frontRightResultVector, angle));
-    m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(frontLeftResultVector, angle));
-    m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(rearLeftResultVector, angle));
-    m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(rearRightResultVector, angle));
+        VectorDouble rearRightRotationVector (
 
-    const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
-    double fr = frontRightResultVector.magnitude() * executionCap;
-    double fl = frontLeftResultVector.magnitude() * executionCap;
-    double rl = rearLeftResultVector.magnitude() * executionCap;
-    double rr = rearRightResultVector.magnitude() * executionCap;
-    frc::SmartDashboard::PutNumber("fr", fr);
-    frc::SmartDashboard::PutNumber("fl", fl);
-    frc::SmartDashboard::PutNumber("rl", rl);
-    frc::SmartDashboard::PutNumber("rr", rr);
-    m_frontRight->SetDriveSpeed(fr);
-    m_frontLeft->SetDriveSpeed(fl);
-    m_rearLeft->SetDriveSpeed(rl);
-    m_rearRight->SetDriveSpeed(rr);
+            z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
+            z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180))
+        );
+
+        /*
+        And the vector we actually want to apply to the swerves is the sum of
+        the two vectors - the vector that forms "straight" (translationVector)
+        and the vector that forms strictly the rotation (rotationVector).
+        */
+        VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
+        VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
+        VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
+        VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
+
+        /*
+        Here, all of the resulting vectors are converted into Nics so that they
+        can be written to the swerve modules using AssumeSwervePosition(). They
+        were in degrees before to enable the use of common trigonomoetry. We
+        get Nics from degrees by calling getSwerveRotatingPosition().
+        */
+        m_frontRight->AssumeSwervePosition(m_frontRight->AbsoluteVectorToNics(frontRightResultVector, angle));
+        m_frontLeft->AssumeSwervePosition(m_frontLeft->AbsoluteVectorToNics(frontLeftResultVector, angle));
+        m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(rearLeftResultVector, angle));
+        m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(rearRightResultVector, angle));
+
+        const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
+        double fr = frontRightResultVector.magnitude() * executionCap;
+        double fl = frontLeftResultVector.magnitude() * executionCap;
+        double rl = rearLeftResultVector.magnitude() * executionCap;
+        double rr = rearRightResultVector.magnitude() * executionCap;
+        frc::SmartDashboard::PutNumber("fr", fr);
+        frc::SmartDashboard::PutNumber("fl", fl);
+        frc::SmartDashboard::PutNumber("rl", rl);
+        frc::SmartDashboard::PutNumber("rr", rr);
+        m_frontRight->SetDriveSpeed(fr);
+        m_frontLeft->SetDriveSpeed(fl);
+        m_rearLeft->SetDriveSpeed(rl);
+        m_rearRight->SetDriveSpeed(rr);
+    }
 }

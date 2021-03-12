@@ -140,8 +140,10 @@ class SwerveTrain {
          * @param rawY The y value to drive the SwerveTrain with
          * @param rawZ The z value to drive the SwerveTrain with
          * @param precise Whether or not to drive with increased precision
+         * @param relative Whether or not to drive relative to the robot and not the field
+         * @param hold Whether or not to hold the current angle
          */
-        void Drive(const double &x, const double &y, const double &z, const bool &precision);
+        void Drive(const double &x, const double &y, const double &z, const bool &precision, const bool &relative, const bool &hold);
 
         /**
          * Prints the positions of the drive motors to the SmartDashboard.

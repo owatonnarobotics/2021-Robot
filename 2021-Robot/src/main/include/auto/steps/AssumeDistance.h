@@ -4,15 +4,29 @@
 #include <string>
 
 #include "SwerveTrain.h"
+#include "VectorDouble.h"
 #include "RobotMap.h"
 
 class AssumeDistance : public AutoStep {
 
     public:
-        AssumeDistance(SwerveTrain &refZion, const double& distanceToAssume) : AutoStep("AssumeDistance") {
+        AssumeDistance(SwerveTrain &refZion, const double& distanceToAssume, const int &directionToMove) : AutoStep("AssumeDistance") {
 
             m_zion = &refZion;
             m_targetDistance = distanceToAssume;
+            switch (directionToMove) {
+
+                case SwerveTrain::ZionDirections::kForward: m_direction = new VectorDouble(0, 1); break;
+                case SwerveTrain::ZionDirections::kRight: m_direction = new VectorDouble(1, 0); break;
+                case SwerveTrain::ZionDirections::kBackward: m_direction = new VectorDouble(0, -1); break;
+                case SwerveTrain::ZionDirections::kLeft: m_direction = new VectorDouble(-1, 0); break;
+            }
+        }
+        AssumeDistance(SwerveTrain &refZion, const double& distanceToAssume, VectorDouble* vectorToGoTo) : AutoStep("AssumeDistance") {
+
+            m_zion = &refZion;
+            m_targetDistance = distanceToAssume;
+            m_direction = vectorToGoTo->toStandard();
         }
 
         void Init() {
@@ -25,8 +39,6 @@ class AssumeDistance : public AutoStep {
             //Calculate the end goal encoder value with circumference and the
             //known amount of encoder values per rotation...
             m_targetEncoderPosition = mInitialFrontRightDrivePosition + (m_targetDistance * R_kuhnsConstant) / R_circumfrenceWheel;
-            frc::SmartDashboard::PutNumber("START", mInitialFrontRightDrivePosition);
-            frc::SmartDashboard::PutNumber("END EXPECTED", m_targetEncoderPosition);
         }
 
         bool Execute() {
@@ -34,11 +46,10 @@ class AssumeDistance : public AutoStep {
             //If we're not in tolerance for meeting the goal value (since
             //going to a distance generates no oscillation, zero can be
             //used as a tolerance)...
-            frc::SmartDashboard::PutNumber("END ACTUAL", m_zion->m_frontRight->GetDrivePosition());
             double delta = m_targetEncoderPosition - m_zion->m_frontRight->GetDrivePosition();
             if (abs(delta) > R_kuhnsConstant * .1) {
 
-                m_zion->SetDriveSpeed(.15);
+                m_zion->Drive(m_direction->i, m_direction->j, 0, false, false, false);
                 //If we made it to here, we didn't succeed, so return false for
                 //another go at it.
                 return false;
@@ -58,6 +69,7 @@ class AssumeDistance : public AutoStep {
         double mInitialFrontRightDrivePosition;
         double m_targetEncoderPosition;
         double m_targetDistance;
+        VectorDouble *m_direction;
 };
 
 #endif

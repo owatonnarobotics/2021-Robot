@@ -104,7 +104,7 @@ public:
                 double z = m_currentValue->z;
                 /*bool precision = m_currentValue->precision;
                 bool limelightLock = m_currentValue->limelightLock;*/
-                m_zion->Drive(x, y, z, false);
+                m_zion->Drive(x, y, z, false, false, false);
                 m_currentValue++;
                 return false;
             }
