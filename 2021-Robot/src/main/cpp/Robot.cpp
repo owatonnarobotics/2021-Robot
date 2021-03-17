@@ -65,12 +65,12 @@ void Robot::RobotInit() {
     m_chooserAuto = new frc::SendableChooser<std::string>;
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded", "Path A Recorded");
-    m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");+
+    m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded and shoot", "Path A Recorded and shoot");
     m_chooserAuto->AddOption("Chooser::Auto::Path B Recorded", "Path B Recorded");
-    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Barrel Racing Path", "brp")
-    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Slalom Path", "sp")
-    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Bounce Path", "bp")
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Barrel Racing Path", "brp");
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Slalom Path", "sp");
+    m_chooserAuto->AddOption("Chooser::Auto::AutoNav Challenge::Bounce Path", "bp");
     m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Test Pre-recorded", "test pre-recorded");
     frc::SmartDashboard::PutData(m_chooserAuto);
@@ -238,8 +238,8 @@ void Robot::TeleopPeriodic() {
         y = playerThree->GetY();
         z = playerThree->GetZ();
     }
-
     Controller::forceControllerXYZToZeroInDeadzone(x, y, z);
+    z *= R_executionCapZionZ;
 
     if (m_chooserController->GetSelected() == "XboxController") {
 
