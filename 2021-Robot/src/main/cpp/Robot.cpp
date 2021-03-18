@@ -3,6 +3,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/XboxController.h>
 #include <frc/Joystick.h>
+#include <cameraserver/CameraServer.h>
 
 #include "Climber.h"
 #include "Intake.h"
@@ -14,6 +15,7 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 #include "Controller.h"
+#include "Vision.h"
 
 // Auto
 #include "auto/AutoStep.h"
@@ -21,6 +23,7 @@
 #include "auto/AsyncLoop.h"
 #include "auto/steps/AssumeDirectionAbsolute.h"
 #include "auto/steps/AssumeDistance.h"
+#include "auto/steps/AssumeRotationDegrees.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "auto/steps/SetLauncherRPM.h"
 #include "auto/steps/SetIndexSpeed.h"
@@ -45,6 +48,7 @@ SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 AutoSequence masterAuto(false);
+Vision cameraData;
 
 void Robot::RobotInit() {
 
@@ -69,6 +73,7 @@ void Robot::RobotInit() {
     m_chooserAuto->AddOption("Chooser::Auto::Path A Recorded and shoot", "Path A Recorded and shoot");
     m_chooserAuto->AddOption("Chooser::Auto::Path A Non-Pre-recorded", "Path A Non-Pre-recorded");
     m_chooserAuto->AddOption("Chooser::Auto::Launch Power Cells", "Launch Power Cells");
+    m_chooserAuto->AddOption("Chooser::Auto::Galactic Search", "Galactic Search");
     m_chooserAuto->SetDefaultOption("Chooser::Auto::Test Pre-recorded", "test pre-recorded");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
@@ -82,6 +87,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
     frc::SmartDashboard::PutString("Recorder::output_file_string", "");
     frc::SmartDashboard::PutNumber("LimelightLock end", .25);
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -182,6 +188,25 @@ void Robot::AutonomousInit() {
         masterAuto.AddStep(new AssumeDistance(zion, 53));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kLeft));
         masterAuto.AddStep(new AssumeDistance(zion, 284));
+    }
+    else if (m_chooserAutoSelected == "Galactic Search"){
+
+        //Code for movement in Galactic Search to be added here:
+
+        cs::CvSink cvSink = frc::CameraServer::GetInstance()->GetVideo();
+        cs::CvSource outputStreamStd = frc::CameraServer::GetInstance()->PutVideo("Gray", 640, 480);
+
+        cv::Mat frame;  //Initializing the image being manipulated by OpenCV 
+        cvSink.GrabFrame(frame);
+
+        double degreesToTurnRound = cameraData.degreesToTurn(frame);
+
+        masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
+
+        masterAuto.AddStep(new WaitSeconds(3));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new WaitSeconds(2));
+        masterAuto.AddStep(new AssumeDistance(zion, 30));
     }
 
     masterAuto.Init();

@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include <frc/SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <fstream>
 #include <sstream>
 #include <frc/DriverStation.h>
