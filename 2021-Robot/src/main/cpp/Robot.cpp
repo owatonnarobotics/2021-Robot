@@ -193,20 +193,22 @@ void Robot::AutonomousInit() {
 
         //Code for movement in Galactic Search to be added here:
 
+        //Gets the video from the camera server and puts it to the output stream.
         cs::CvSink cvSink = frc::CameraServer::GetInstance()->GetVideo();
-        cs::CvSource outputStreamStd = frc::CameraServer::GetInstance()->PutVideo("Gray", 640, 480);
+        cs::CvSource outputStreamStd = frc::CameraServer::GetInstance()->PutVideo("Test", 640, 480);
 
-        cv::Mat frame;  //Initializing the image being manipulated by OpenCV 
-        cvSink.GrabFrame(frame);
+        cv::Mat frame;           //Initializing the image being manipulated by OpenCV 
+        cvSink.GrabFrame(frame); //Converts image from camera to Mat format (for manipulation)
 
+        //Finds the estimated number of degrees Zion need to turn based on the image given.
         double degreesToTurnRound = cameraData.degreesToTurn(frame);
 
+        //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
         masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
-
         masterAuto.AddStep(new WaitSeconds(3));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
         masterAuto.AddStep(new WaitSeconds(2));
-        masterAuto.AddStep(new AssumeDistance(zion, 30));
+        masterAuto.AddStep(new AssumeDistance(zion, 15));
     }
 
     masterAuto.Init();

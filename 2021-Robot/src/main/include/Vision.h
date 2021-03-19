@@ -1,8 +1,9 @@
 /*
 class Vision
 Constructors
-    To be determined?
+    
 Public
+
     double estPixelsPerDegree
         Estimated number of pixels per degree in field of view. Used later on
         to determine how many degrees robot will need to rotate.
@@ -37,8 +38,9 @@ class Vision {
 
         Vision(){
         };
+        //Needs to be cleaned up and documented better in some spots.
 
-        //Estimate for pixels per degree of view. Will need to adjust.
+        //Estimate for pixels per degree of view. Will need to adjust based on USB camera FOV.
         double estPixelsPerDegree = 640 / 55; // ~ 11.636363 pixels per degree
 
 
@@ -106,6 +108,7 @@ class Vision {
         }
 
 
+        //May be removed in future version if determined to not be needed.
         cv::Mat optionalVisualOutput(cv::Mat frame){
             
             cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
