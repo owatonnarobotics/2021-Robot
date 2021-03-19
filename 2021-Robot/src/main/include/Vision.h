@@ -104,7 +104,7 @@ class Vision {
 
             int pixelsFromCenter = largest[0] - 320;
 
-            return pixelsFromCenter / estPixelsPerDegree;
+            return ((pixelsFromCenter / estPixelsPerDegree) * -1);
         }
 
 
