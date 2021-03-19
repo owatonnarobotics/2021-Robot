@@ -218,6 +218,7 @@ void Robot::TeleopInit() {
     //To clean up adter auto, confirm the swerves and drives are locked
     zion.SetSwerveBrake(true);
     zion.SetDriveBrake(true);
+    navX.resetYaw();
 }
 void Robot::TeleopPeriodic() {
     
@@ -297,7 +298,7 @@ void Robot::TeleopPeriodic() {
                 playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : z,
                 playerThree->GetRawButton(5),
                 playerThree->GetRawButton(7),
-                false
+                playerThree->GetRawButton(2)
             );
         }
         if (playerThree->GetRawButton(1)) {

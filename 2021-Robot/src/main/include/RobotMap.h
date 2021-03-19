@@ -109,5 +109,11 @@ const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSp
 const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt = 2.5;
 const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed = .025;
 
+const double R_swerveTrainHoldAngleTolerance = 1.0;
+const double R_swerveTrainHoldAngleSpeedCalculatonFirstEndBehaviorAt = 10.0;
+const double R_swerveTrainHoldAngleSpeedCalculatonFirstEndBehaviorSpeed = .075;
+const double R_swerveTrainHoldAngleSpeedCalculatonSecondEndBehaviorAt = 5.0;
+const double R_swerveTrainHoldAngleSpeedCalculatonSecondEndBehaviorSpeed = .075;
+
 const double R_circumfrenceWheel = 4 * M_PI;
 /*___End Global Robot Variable Settings___*/

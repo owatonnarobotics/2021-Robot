@@ -116,13 +116,15 @@ void SwerveTrain::PrintSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::Drive(const double &x, const double &y, const double &z, const bool &precision, const bool &relative, const bool &hold) {
+void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold) {
 
-    if (x == 0 && y == 0 && z == 0) {
+    if (!hold && x == 0 && y == 0 && rawZ == 0) {
 
         Stop();
     }
     else {
+        
+        double z = rawZ;
 
         /*
         The translation vector is the "standard" vector - that is, if no
@@ -138,16 +140,51 @@ void SwerveTrain::Drive(const double &x, const double &y, const double &z, const
         //TODO: why inverted?
         VectorDouble translationVector(-x, y);
 
-        //Get the navX yaw angle for computing the field-oriented
-        //angle only if field oriented
         double angle;
+        //Get the navX yaw angle for computing the field-oriented
+        //angle only if field orienteds
         if (relative) {
 
             angle = 0;
         }
+        else if (hold) {
+
+            angle = navX->getYaw();
+        }
         else {
-            
+
             angle = navX->getYawFull();
+        }
+
+        frc::SmartDashboard::PutNumber("Angle", angle);
+
+        if (hold) {
+
+            //Update our rotational speed so that we turn towards the goal.
+            //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
+            z = ((1) / (1 + exp((-1 * abs(1.0 / 4.0 * angle)) + 5)));
+            //If we satisfy conditions for the first linear piecewise, take that speed instead...
+            if (abs(angle) < R_swerveTrainHoldAngleSpeedCalculatonFirstEndBehaviorAt) {
+
+                z = R_swerveTrainHoldAngleSpeedCalculatonFirstEndBehaviorSpeed;
+            }
+            //Do the same for the second...
+            /*if (abs(angle) < R_swerveTrainHoldAngleSpeedCalculatonSecondEndBehaviorAt) {
+
+                z = R_swerveTrainHoldAngleSpeedCalculatonSecondEndBehaviorSpeed;
+            }*/
+            //And if we needed to travel negatively to get where we need to be, make the final speed negative...
+            if (abs(angle) < R_swerveTrainHoldAngleTolerance) {
+
+                z = 0;
+            }
+            if (angle < 0) {
+
+                z = -z;
+            }
+            z *= -1;
+            angle = navX->getYawFull();
+            frc::SmartDashboard::PutNumber("HoldAngleSpeedCalculaton", z);
         }
 
         /*
