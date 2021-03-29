@@ -20,10 +20,16 @@ Public
     double degreesToTurn(cv::Mat)
         Estimates degrees robot will need to turn to line up with power cell.
         Used in auto to determine how far it has to turn to line up from just the image.
+    cv::Mat imageCapturer()
+        Takes in most recent image from USB camera and converts it to the Mat type, 
+        needed for image processing using openCV.
     cv::Mat optionalVisionOutput(cv::Mat)
         Outlines circles, places radius and x value, then highlights text of largest radius.
         Currently unused, mainly was for testing phase.
 */
+
+#ifndef VISION_H
+#define VISION_H
 
 #include "opencv2/opencv.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
@@ -31,6 +37,7 @@ Public
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <cameraserver/CameraServer.h>
 
 class Vision {
 
@@ -108,6 +115,17 @@ class Vision {
         }
 
 
+        cv::Mat imageCapturer(){
+
+            cs::CvSink cvSink = frc::CameraServer::GetInstance()->GetVideo();
+
+            cv::Mat frame;           //Initializing the image being manipulated by OpenCV 
+            cvSink.GrabFrame(frame); //Converts image from camera to Mat format (for manipulation)
+
+            return frame;
+        }
+
+
         //May be removed in future version if determined to not be needed.
         cv::Mat optionalVisualOutput(cv::Mat frame){
             
@@ -166,3 +184,4 @@ class Vision {
             return frame;
         };
 };
+#endif
