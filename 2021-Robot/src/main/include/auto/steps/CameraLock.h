@@ -16,7 +16,8 @@ class CameraLock : public AutoStep {
 
     public:
 
-        CameraLock(cv::Mat frame, 
+        CameraLock(
+            cv::Mat frame, 
             SwerveTrain &refZion,
             Limelight &refLimelight,
             NavX &refNavX
@@ -29,7 +30,8 @@ class CameraLock : public AutoStep {
         }
 
         void Init(){
-
+            
+            //Initializes the image and how many degrees per turn.
             m_image = cameraView.imageCapturer();
             degreesPerTurn = 30;
         }
@@ -39,7 +41,9 @@ class CameraLock : public AutoStep {
             cv::Vec3i largestVector = cameraView.largestVectorByImage(m_image);
             int turnsMade = 0;
             
-            while(largestVector[0] < 5 || turnsMade >= (360 / degreesPerTurn)) {
+            //Turns Zion in 30 degree increments until it sees a circle larger than 4 pixels in radius
+            //or has reached a full circle of rotation. Prevents non-stop turning, if none is seen.
+            while(largestVector[2] < 4 && turnsMade < (360 / degreesPerTurn)) {
 
                 turnsMade++;
                 AssumeRotationDegrees(*m_zion, *m_limelight, *m_navX, degreesPerTurn);

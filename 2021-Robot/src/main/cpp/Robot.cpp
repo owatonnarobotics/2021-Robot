@@ -205,11 +205,12 @@ void Robot::AutonomousInit() {
         double degreesToTurnRound = cameraData.degreesToTurn(frame);
 
         //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
-        masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
-        masterAuto.AddStep(new WaitSeconds(3));
-        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        masterAuto.AddStep(new CameraLock(frame, zion, limelight, navX));        
+        //masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
         masterAuto.AddStep(new WaitSeconds(2));
-        masterAuto.AddStep(new AssumeDistance(zion, 15));
+        masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
+        //masterAuto.AddStep(new WaitSeconds(1.5));
+        //masterAuto.AddStep(new AssumeDistance(zion, 15));
     }
 
     masterAuto.Init();
