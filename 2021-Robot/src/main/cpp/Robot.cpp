@@ -24,6 +24,7 @@
 #include "auto/steps/AssumeDirectionAbsolute.h"
 #include "auto/steps/AssumeDistance.h"
 #include "auto/steps/AssumeRotationDegrees.h"
+#include "auto/steps/CameraLock.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "auto/steps/SetLauncherRPM.h"
 #include "auto/steps/SetIndexSpeed.h"
