@@ -40,19 +40,24 @@ class CameraLock : public AutoStep {
             cv::Vec3i largestVector = cameraView.largestVectorByImage(m_image);
             int turnsMade = 0;
             
-            //Turns Zion in 30 degree increments until it sees a circle larger than 4 pixels in radius
-            //or has reached a full circle of rotation. Prevents non-stop turning, if none are seen.
+            AutoSequence loop(true);
+            loop.AddStep(new AssumeRotationDegrees(*m_zion, *m_limelight, *m_navX, degreesPerTurn));
+            loop.AddStep(new WaitSeconds(0.75));
+            loop.Init();
+
+            //Turns Zion in 30 degree increments (set above) until it sees a circle 
+            //larger than 4 pixels in radius (limits false positives) or has reached a
+            //full circle of rotation. Prevents non-stop turning, if no cells are seen.
             while(largestVector[2] < 4 && turnsMade < (360 / degreesPerTurn)) {
 
-                AssumeRotationDegrees(*m_zion, *m_limelight, *m_navX, degreesPerTurn);
-                WaitSeconds(0.75);
+                loop.Execute();
                 turnsMade++;
 
                 m_image = cameraView.imageCapturer();
                 largestVector = cameraView.largestVectorByImage(m_image);
             }
             
-            //Once power cell is in view, rotate to line up using x coordinates of it.
+            //Once power cell is in view, final rotation to line up using x coordinate of it.
             m_image = cameraView.imageCapturer();
             double degreesToTurnRound = cameraView.degreesToTurn(m_image);
 
