@@ -116,7 +116,9 @@ void SwerveTrain::PrintSwervePositions() {
     frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->GetSwervePosition());
 }
 
-void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold) {
+void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold, const double throttle) {
+
+    frc::SmartDashboard::PutNumber("Throttle", throttle);
 
     if (!hold && x == 0 && y == 0 && rawZ == 0) {
 
@@ -240,7 +242,7 @@ void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, con
         m_rearLeft->AssumeSwervePosition(m_rearLeft->AbsoluteVectorToNics(rearLeftResultVector, angle));
         m_rearRight->AssumeSwervePosition(m_rearRight->AbsoluteVectorToNics(rearRightResultVector, angle));
 
-        const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
+        const double executionCap = throttle;//precision ? R_executionCapZionPrecision : R_executionCapZion;
         double fr = frontRightResultVector.magnitude() * executionCap;
         double fl = frontLeftResultVector.magnitude() * executionCap;
         double rl = rearLeftResultVector.magnitude() * executionCap;

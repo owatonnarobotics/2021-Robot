@@ -55,7 +55,7 @@ const double R_deadzoneControllerZ = 0.15;
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_executionCapZion = 1.00;
-const double R_executionCapZionZ = .25;
+const double R_executionCapZionZ = .5;
 //This is at what rate the regular execution cap is scaled for precision driving.
 const double R_executionCapZionPrecision = .15 * R_executionCapZion;
 //This one is for running the intake motors.

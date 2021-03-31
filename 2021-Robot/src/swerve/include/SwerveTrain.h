@@ -143,7 +143,7 @@ class SwerveTrain {
          * @param relative Whether or not to drive relative to the robot and not the field
          * @param hold Whether or not to hold the current angle
          */
-        void Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold);
+        void Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold, const double throttle = 1.0);
 
         /**
          * Prints the positions of the drive motors to the SmartDashboard.

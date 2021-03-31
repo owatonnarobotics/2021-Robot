@@ -298,7 +298,8 @@ void Robot::TeleopPeriodic() {
                 playerThree->GetRawButton(6) ? limelight.CalculateLimelightLockSpeed() : z,
                 playerThree->GetRawButton(5),
                 playerThree->GetRawButton(7),
-                playerThree->GetRawButton(2)
+                playerThree->GetRawButton(2),
+                -(((playerThree->GetThrottle() + 1.0) / 2.0) - 1.0)
             );
         }
         if (playerThree->GetRawButton(1)) {
