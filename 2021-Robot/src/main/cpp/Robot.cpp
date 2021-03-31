@@ -24,6 +24,7 @@
 #include "auto/steps/AssumeDirectionAbsolute.h"
 #include "auto/steps/AssumeDistance.h"
 #include "auto/steps/AssumeRotationDegrees.h"
+#include "auto/steps/CameraDrive.h"
 #include "auto/steps/CameraLock.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "auto/steps/SetLauncherRPM.h"
@@ -207,7 +208,7 @@ void Robot::AutonomousInit() {
         //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
         masterAuto.AddStep(new CameraLock(frame, zion, limelight, navX));        
         //masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
-        masterAuto.AddStep(new WaitSeconds(2));
+        masterAuto.AddStep(new WaitSeconds(1.5));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
         //masterAuto.AddStep(new WaitSeconds(1.5));
         //masterAuto.AddStep(new AssumeDistance(zion, 15));

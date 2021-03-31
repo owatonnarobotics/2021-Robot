@@ -3,6 +3,7 @@
 
 #include "Vision.h"
 #include "RobotMap.h"
+#include "auto/AutoSequence.h"
 #include "auto/steps/AssumeRotationDegrees.h"
 #include "auto/steps/WaitSeconds.h"
 
