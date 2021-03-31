@@ -62,7 +62,10 @@ class CameraLock : public AutoStep {
             m_image = cameraView.imageCapturer();
             double degreesToTurnRound = cameraView.degreesToTurn(m_image);
 
-            AssumeRotationDegrees(*m_zion, *m_limelight, *m_navX, degreesToTurnRound);
+            AutoSequence lastStep(false);
+            lastStep.AddStep(new AssumeRotationDegrees(*m_zion, *m_limelight, *m_navX, degreesToTurnRound));
+            lastStep.Init();
+            while (!lastStep.Execute());
 
             return true;
         }
