@@ -168,14 +168,15 @@ class Vision {
 
                     return -(pow(largestVector[0], 2) / 90000) * 0.50;
                 }
+                else {
+
+                    return 0.0;
+                }
             }
             else {
 
-                return 1.0;
+                return 0.50;
             }
-
-        
-        return 0.0;
         }
 
 
