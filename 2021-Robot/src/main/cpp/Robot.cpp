@@ -26,6 +26,7 @@
 #include "auto/steps/AssumeRotationDegrees.h"
 #include "auto/steps/CameraDrive.h"
 #include "auto/steps/CameraLock.h"
+#include "auto/steps/CameraLock2.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "auto/steps/SetLauncherRPM.h"
 #include "auto/steps/SetIndexSpeed.h"
@@ -206,7 +207,7 @@ void Robot::AutonomousInit() {
         double degreesToTurnRound = cameraData.degreesToTurn(frame);
 
         //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
-        masterAuto.AddStep(new CameraLock(frame, zion, limelight, navX));        
+        masterAuto.AddStep(new CameraLock2(frame, zion, limelight, navX));        
         //masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
         masterAuto.AddStep(new WaitSeconds(1.5));
         masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));

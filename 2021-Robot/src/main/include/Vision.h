@@ -126,6 +126,59 @@ class Vision {
         }
 
 
+        bool hasTarget(cv::Mat frame){
+
+            cv::Vec3i largestVector = largestVectorByImage(frame);
+            
+            if (largestVector[2] > 4 && largestVector[0] < 30) {
+
+                return true;
+            }
+            else {
+
+                return false;
+            }
+        }
+
+
+        bool withinCameraTolerance(cv::Mat frame){
+
+            cv::Vec3i largestVector = largestVectorByImage(frame);
+
+            if (abs(largestVector[0]) < 30){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+        double cameraSpeedNeeded(cv::Mat frame){
+
+            cv::Vec3i largestVector = largestVectorByImage(frame);
+
+            if (hasTarget(frame)) {
+
+                if (largestVector[0] > 30){
+
+                    return (pow(largestVector[0], 2) / 90000) * 0.50;
+                }
+                else if (largestVector[0] < -30){
+
+                    return -(pow(largestVector[0], 2) / 90000) * 0.50;
+                }
+            }
+            else {
+
+                return 1.0;
+            }
+
+        
+        return 0.0;
+        }
+
+
         //May be removed in future version if determined to not be needed.
         cv::Mat optionalVisualOutput(cv::Mat frame){
             
