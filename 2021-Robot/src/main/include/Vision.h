@@ -160,13 +160,13 @@ class Vision {
 
             if (hasTarget(frame)) {
 
-                if (largestVector[0] > 30){
+                if (largestVector[0] > 100){
 
-                    return (pow(largestVector[0], 2) / 90000) * 0.50;
+                    return -(pow(largestVector[0], 2) / 90000) * 0.25;
                 }
-                else if (largestVector[0] < -30){
+                else if (largestVector[0] < -100){
 
-                    return -(pow(largestVector[0], 2) / 90000) * 0.50;
+                    return (pow(largestVector[0], 2) / 90000) * 0.25;
                 }
                 else {
 
@@ -175,7 +175,7 @@ class Vision {
             }
             else {
 
-                return 0.50;
+                return 0.25;
             }
         }
 

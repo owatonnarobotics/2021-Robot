@@ -19,13 +19,11 @@ class CameraLock2 : public AutoStep {
         CameraLock2(
             cv::Mat frame, 
             SwerveTrain &refZion,
-            Limelight &refLimelight,
             NavX &refNavX
         ) : AutoStep("CameraLock2") {
 
             m_image = frame;
             m_zion = &refZion;
-            m_limelight = &refLimelight;
             m_navX = &refNavX;
         }
 
@@ -42,13 +40,15 @@ class CameraLock2 : public AutoStep {
 
             m_zion->Drive(0, 0, cameraView2.cameraSpeedNeeded(m_image), false);
             
+            if (cameraView2.withinCameraTolerance(m_image)){
+                m_zion->Drive(0, 0, 0, false);
+            }
             return cameraView2.withinCameraTolerance(m_image);
         }
     
     private:
         cv::Mat m_image;
         SwerveTrain* m_zion;
-        Limelight* m_limelight;
         NavX* m_navX;
         double degreesPerTurn;   
 };
