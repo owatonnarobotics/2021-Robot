@@ -203,18 +203,11 @@ void Robot::AutonomousInit() {
 
         //Code for movement in Galactic Search to be added here:
 
-        //Gets the video from the camera server and puts it to the output stream.
-
         //Finds the estimated number of degrees Zion need to turn based on the image given.
-        double degreesToTurnRound = cameraData.degreesToTurn(frame);
+        //double degreesToTurnRound = cameraData.degreesToTurn(frame); Currently unused.
 
         //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
         masterAuto.AddStep(new CameraLock2(frame, zion, navX));        
-        //masterAuto.AddStep(new AssumeRotationDegrees(zion, limelight, navX, degreesToTurnRound));
-        //masterAuto.AddStep(new WaitSeconds(1.5));
-        //masterAuto.AddStep(new AssumeDirectionAbsolute(zion, SwerveTrain::ZionDirections::kForward));
-        //masterAuto.AddStep(new WaitSeconds(1.5));
-        //masterAuto.AddStep(new AssumeDistance(zion, 15));
     }
 
     masterAuto.Init();

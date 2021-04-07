@@ -23,6 +23,11 @@ Public
     cv::Mat imageCapturer()
         Takes in most recent image from USB camera and converts it to the Mat type, 
         needed for image processing using openCV.
+    bool hasTarget(cv::Mat)
+        Checks if the camera has imaged and is tracking a power cell currently.
+    bool withinCameraTolerance(cv::Mat)
+        Checks if the power cell x value is within a tolerance range set.
+    double cameraSpeedNeeded
     cv::Mat optionalVisionOutput(cv::Mat)
         Outlines circles, places radius and x value, then highlights text of largest radius.
         Currently unused, mainly was for testing phase.
@@ -130,7 +135,8 @@ class Vision {
 
             cv::Vec3i largestVector = largestVectorByImage(frame);
             
-            if (largestVector[2] > 4 && largestVector[0] < 30) {
+            //If the power cell is larger than our noise limit, output true.
+            if (largestVector[2] > R_cameraLowerPowerCellRadiusLimit) {
 
                 return true;
             }
@@ -139,43 +145,49 @@ class Vision {
                 return false;
             }
         }
-
 
         bool withinCameraTolerance(cv::Mat frame){
 
             cv::Vec3i largestVector = largestVectorByImage(frame);
 
-            if (abs(largestVector[0]) < 30){
+            //If the power cell is within our tolerance and larger than the noise limit,
+            //output that the ball is within tolerance.
+            if (abs(largestVector[0]) < R_cameraRotationToleranceInPixels && hasTarget(frame)){
+                
                 return true;
             }
             else {
+
                 return false;
             }
         }
-
 
         double cameraSpeedNeeded(cv::Mat frame){
 
             cv::Vec3i largestVector = largestVectorByImage(frame);
 
+            //First checks if the camera has a power cell in view...
             if (hasTarget(frame)) {
 
-                if (largestVector[0] > 100){
+                //then determines which way and how fast, if so. If within tolerance, set to 0.
+                //Quadratic hits the auto execution cap at 320 pixels.
+                if (largestVector[0] > R_cameraRotationToleranceInPixels){
 
-                    return -(pow(largestVector[0], 2) / 90000) * 0.25;
+                    return -(pow(largestVector[0], 2) / 102400) * R_autoSearchTurningSpeedExecutionCap;
                 }
-                else if (largestVector[0] < -100){
+                else if (largestVector[0] < -R_cameraRotationToleranceInPixels){
 
-                    return (pow(largestVector[0], 2) / 90000) * 0.25;
+                    return (pow(largestVector[0], 2) / 102400) * R_autoSearchTurningSpeedExecutionCap;
                 }
                 else {
 
                     return 0.0;
                 }
             }
+            //If the camera does not have a target, presumes that it needs to turn to find it.
             else {
 
-                return 0.25;
+                return R_autoSearchTurningSpeedExecutionCap;
             }
         }
 

@@ -43,6 +43,7 @@ class CameraLock2 : public AutoStep {
             if (cameraView2.withinCameraTolerance(m_image)){
                 m_zion->Drive(0, 0, 0, false);
             }
+            
             return cameraView2.withinCameraTolerance(m_image);
         }
     
