@@ -24,8 +24,7 @@
 #include "auto/steps/AssumeDirectionAbsolute.h"
 #include "auto/steps/AssumeDistance.h"
 #include "auto/steps/AssumeRotationDegrees.h"
-#include "auto/steps/CameraDrive.h"
-#include "auto/steps/CameraLock.h"
+#include "auto/steps/CameraDrive2.h"
 #include "auto/steps/CameraLock2.h"
 #include "auto/steps/RunPrerecorded.h"
 #include "auto/steps/SetLauncherRPM.h"
@@ -51,7 +50,7 @@ SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 AutoSequence masterAuto(false);
-Vision cameraData;
+//Vision cameraData;
 
 void Robot::RobotInit() {
 
@@ -207,7 +206,9 @@ void Robot::AutonomousInit() {
         //double degreesToTurnRound = cameraData.degreesToTurn(frame); Currently unused.
 
         //Wait steps are added to ensure actions are done properly before proceding further, allowing disabling.
-        masterAuto.AddStep(new CameraLock2(frame, zion, navX));        
+        masterAuto.AddStep(new CameraLock2(frame, zion, navX));      
+        masterAuto.AddStep(new WaitSeconds(1));
+        masterAuto.AddStep(new CameraDrive2(frame, zion));
     }
 
     masterAuto.Init();

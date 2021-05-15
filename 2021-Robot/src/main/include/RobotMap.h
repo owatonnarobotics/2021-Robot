@@ -110,9 +110,12 @@ const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorS
 
 //These constants are for the camera-based auto steps.
 //The lower power cell radius limit is to help filter out some noise.
+//First three are in pixels, the other two are percentages for driving Zion.
 const double R_cameraRotationToleranceInPixels = 100;
-const double R_cameraLowerPowerCellRadiusLimit = 4;
+const double R_cameraDriveCloseEnoughLimit = 100;
+const double R_cameraLowerPowerCellNoiseLimit = 4;
 const double R_autoSearchTurningSpeedExecutionCap = 0.25;
+const double R_autoSearchDriveSpeedExecutionCap = 0.20;
 
 const double R_circumfrenceWheel = 4 * M_PI;
 /*___End Global Robot Variable Settings___*/

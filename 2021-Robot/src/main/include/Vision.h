@@ -25,9 +25,13 @@ Public
         needed for image processing using openCV.
     bool hasTarget(cv::Mat)
         Checks if the camera has imaged and is tracking a power cell currently.
-    bool withinCameraTolerance(cv::Mat)
+    bool withinCameraRotationTolerance(cv::Mat)
         Checks if the power cell x value is within a tolerance range set.
-    double cameraSpeedNeeded
+    bool withinCameraDriveTolerance(cv::Mat)
+        Tests if the powercell is close enough that Zion should stop and do nothing.
+    double cameraRotationSpeedNeeded(cv::Mat)
+        Determines the speed that the robot should be turning at, based on the position of the ball.
+    double cameraDriveSpeedNeeded
     cv::Mat optionalVisionOutput(cv::Mat)
         Outlines circles, places radius and x value, then highlights text of largest radius.
         Currently unused, mainly was for testing phase.
@@ -136,7 +140,7 @@ class Vision {
             cv::Vec3i largestVector = largestVectorByImage(frame);
             
             //If the power cell is larger than our noise limit, output true.
-            if (largestVector[2] > R_cameraLowerPowerCellRadiusLimit) {
+            if (largestVector[2] > R_cameraLowerPowerCellNoiseLimit) {
 
                 return true;
             }
@@ -146,7 +150,9 @@ class Vision {
             }
         }
 
-        bool withinCameraTolerance(cv::Mat frame){
+        
+
+        bool withinCameraRotationTolerance(cv::Mat frame){
 
             cv::Vec3i largestVector = largestVectorByImage(frame);
 
@@ -162,7 +168,22 @@ class Vision {
             }
         }
 
-        double cameraSpeedNeeded(cv::Mat frame){
+        bool withinCameraDriveTolerance(cv::Mat frame) {
+
+            cv::Vec3i largestVector = largestVectorByImage(frame);
+
+            if (abs(largestVector[2]) > R_cameraDriveCloseEnoughLimit && hasTarget(frame)){
+
+                return true;
+            }
+            else {
+
+                return false;
+            }
+        }
+
+
+        double cameraRotationSpeedNeeded(cv::Mat frame){
 
             cv::Vec3i largestVector = largestVectorByImage(frame);
 
@@ -189,6 +210,26 @@ class Vision {
 
                 return R_autoSearchTurningSpeedExecutionCap;
             }
+        }
+
+
+        double cameraDriveSpeedNeeded(cv::Mat frame){
+
+            cv::Vec3i largestVector = largestVectorByImage(frame);
+
+            if (hasTarget(frame)){
+
+                if (largestVector[2] > R_cameraDriveCloseEnoughLimit) {
+
+                    return R_autoSearchDriveSpeedExecutionCap;
+                }
+                else {
+
+                    return 0;
+                }
+            }
+
+            return 0;
         }
 
 

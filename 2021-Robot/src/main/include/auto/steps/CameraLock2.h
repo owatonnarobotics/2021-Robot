@@ -38,20 +38,19 @@ class CameraLock2 : public AutoStep {
             
             m_image = cameraView2.imageCapturer();
 
-            m_zion->Drive(0, 0, cameraView2.cameraSpeedNeeded(m_image), false);
+            m_zion->Drive(0, 0, cameraView2.cameraRotationSpeedNeeded(m_image), false);
             
-            if (cameraView2.withinCameraTolerance(m_image)){
+            if (cameraView2.withinCameraRotationTolerance(m_image)){
                 m_zion->Drive(0, 0, 0, false);
             }
             
-            return cameraView2.withinCameraTolerance(m_image);
+            return cameraView2.withinCameraRotationTolerance(m_image);
         }
     
     private:
         cv::Mat m_image;
         SwerveTrain* m_zion;
-        NavX* m_navX;
-        double degreesPerTurn;   
+        NavX* m_navX; 
 };
 
 #endif
