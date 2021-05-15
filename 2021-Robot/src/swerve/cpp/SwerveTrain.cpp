@@ -118,6 +118,9 @@ void SwerveTrain::PrintSwervePositions() {
 
 void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, const bool &precision, const bool &relative, const bool &hold, const double throttle) {
 
+    static double holdAngle = 0.0;
+    static bool wasHolding = false;
+
     frc::SmartDashboard::PutNumber("Throttle", throttle);
 
     if (!hold && x == 0 && y == 0 && rawZ == 0) {
@@ -151,11 +154,17 @@ void SwerveTrain::Drive(const double &x, const double &y, const double rawZ, con
         }
         else if (hold) {
 
-            angle = navX->getYaw();
+            /*if (!wasHolding) {
+
+                holdAngle = navX->getYawFull();
+            }*/
+            angle = navX->getYaw() - holdAngle;
+            //wasHolding = true;
         }
         else {
 
             angle = navX->getYawFull();
+            //wasHolding = false;
         }
 
         frc::SmartDashboard::PutNumber("Angle", angle);

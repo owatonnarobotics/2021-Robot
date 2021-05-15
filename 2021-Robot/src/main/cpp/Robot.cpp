@@ -302,14 +302,14 @@ void Robot::TeleopPeriodic() {
                 -(((playerThree->GetThrottle() + 1.0) / 2.0) - 1.0)
             );
         }
-        if (playerThree->GetRawButton(1)) {
+        /*if (playerThree->GetRawButton(1)) {
 
             recorder.Record(x, y, z, false);
         }
         else {
 
             recorder.Publish();
-        }
+        }*/
     }
 
     //The second controller works in control layers on top of the basic

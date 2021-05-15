@@ -156,7 +156,6 @@ class SwerveTrain {
         SwerveModule *m_rearRight;
         NavX *navX;
 
-
         enum ZionDirections {
 
             kForward, kRight, kBackward, kLeft
