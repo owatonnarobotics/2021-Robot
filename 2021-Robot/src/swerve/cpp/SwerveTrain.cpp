@@ -5,12 +5,22 @@
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 
-SwerveTrain::SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
+SwerveTrain::SwerveTrain(
+        const int frontRightCANDriveID,
+        const int frontRightCANSwerveID,
+        const int frontLeftCANDriveID,
+        const int frontLeftCANSwerveID,
+        const int rearLeftCANDriveID,
+        const int rearLeftCANSwerveID,
+        const int rearRightCANDriveID,
+        const int rearRightCANSwerveID,
+        NavX &navXToSet
+    ) {
 
-    m_frontRight = &frontRightModule;
-    m_frontLeft = &frontLeftModule;
-    m_rearLeft = &rearLeftModule;
-    m_rearRight = &rearRightModule;
+    m_frontRight = new SwerveModule(frontRightCANDriveID, frontRightCANSwerveID);
+    m_frontLeft = new SwerveModule(frontLeftCANDriveID, frontLeftCANSwerveID);
+    m_rearLeft = new SwerveModule(rearLeftCANDriveID, rearLeftCANSwerveID);
+    m_rearRight = new SwerveModule(rearRightCANDriveID, rearRightCANSwerveID);
     navX = &navXToSet;
 }
 

@@ -29,13 +29,27 @@ class SwerveTrain {
          * front left, back left, and back right positions, and takes a NavX
          * for use in calculating rotational vectors.
          * 
-         * @param frontRightModule A reference to the front right SwerveModule
-         * @param frontLeftModule A reference to the front left SwerveModule
-         * @param rearLeftModule A reference to the rear left SwerveModule
-         * @param rearRightModule A reference to the rear right SwerveModule
+         * @param frontRightCANDriveID  CAN ID of the front right   drive   motor
+         * @param frontRightCANSwerveID CAN ID of the front right   swerve  motor
+         * @param frontLeftCANDriveID   CAN ID of the front left    drive   motor
+         * @param frontLeftCANSwerveID  CAN ID of the front left    swerve  motor
+         * @param rearLeftCANDriveID    CAN ID of the rear  right   drive   motor
+         * @param rearLeftCANSwerveID   CAN ID of the rear  right   swerve  motor
+         * @param rearRightCANDriveID   CAN ID of the rear  left    drive   motor
+         * @param rearRightCANSwerveID  CAN ID of the rear  left    swerve  motor 
          * @param navXToSet A reference to a NavX
          */
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet);
+        SwerveTrain(
+            const int frontRightCANDriveID,
+            const int frontRightCANSwerveID,
+            const int frontLeftCANDriveID,
+            const int frontLeftCANSwerveID,
+            const int rearLeftCANDriveID,
+            const int rearLeftCANSwerveID,
+            const int rearRightCANDriveID,
+            const int rearRightCANSwerveID,
+            NavX &navXToSet
+        );
 
         /**
          * Sets a speed to the driving motors on the train. Defaults to zero.

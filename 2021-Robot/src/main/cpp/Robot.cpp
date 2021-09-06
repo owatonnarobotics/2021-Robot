@@ -11,7 +11,6 @@
 #include "NavX.h"
 #include "Robot.h"
 #include "RobotMap.h"
-#include "SwerveModule.h"
 #include "SwerveTrain.h"
 #include "Controller.h"
 
@@ -39,11 +38,17 @@ Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CA
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
 Recorder recorder;
-SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
-SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
-SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
-SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
+SwerveTrain zion(
+    R_CANIDZionFrontRightDrive,
+    R_CANIDZionFrontRightSwerve,
+    R_CANIDZionFrontLeftDrive,
+    R_CANIDZionFrontLeftSwerve,
+    R_CANIDZionRearLeftDrive,
+    R_CANIDZionRearLeftSwerve,
+    R_CANIDZionRearRightDrive,
+    R_CANIDZionRearRightSwerve,
+    navX
+);
 AutoSequence masterAuto(false);
 
 void Robot::RobotInit() {
