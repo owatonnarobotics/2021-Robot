@@ -29,13 +29,16 @@ Public Methods
 #include <frc/DigitalInput.h>
 #include <frc/Servo.h>
 #include <frc/VictorSP.h>
+#include "rev/CANSparkMax.h"
 
 class Climber {
 
     public:
-        Climber(const int &climbMotorPWMPort, const int &translateMotorPWMPort, const int &wheelMotorPWMPort, const int &servoPWMPort, const int &limitDIOPort) {
+        Climber(const int &canForwardID, const int &canRearID, const int &translateMotorPWMPort, const int &wheelMotorPWMPort, const int &servoPWMPort, const int &limitDIOPort) {
 
-            m_climbMotor = new frc::VictorSP(climbMotorPWMPort);
+            m_forwardClimbMotor = new rev::CANSparkMax(canForwardID, rev::CANSparkMax::MotorType::kBrushed);
+            m_rearClimbMotor = new rev::CANSparkMax(canRearID, rev::CANSparkMax::MotorType::kBrushed);
+
             m_translateMotor = new frc::VictorSP(translateMotorPWMPort);
             m_wheelMotor = new frc::VictorSP(wheelMotorPWMPort);
 
@@ -49,23 +52,33 @@ class Climber {
             switch (motor) {
 
                 case Motor::kClimb:
+                    // Nolan told me to bypass the limit switch
+                    //    |
+                    //    |
+                    //    |
+                    //   \ /
+                    //    v
+                    //=========================================================
                     //If a downward direction is wanted, do not allow it to
                     //happen if the bottom position is already reached.
-                    if (speedToSet < 0) {
+                    /*if (speedToSet < 0) {
 
                         //Switches are normally open, so invert.
                         if (!m_limitBottom->Get()) {
 
                             speedToSet = 0;
                         }
-                    }
-                    m_climbMotor->Set(speedToSet);
+                    }*/
+                    //=========================================================
+                    m_forwardClimbMotor->Set(speedToSet);
+                    m_rearClimbMotor->Set(speedToSet);
                     break;
                 //This motor is mounted upside-down, so invert it.
                 case Motor::kTranslate: m_translateMotor->Set(-speedToSet); break;
                 case Motor::kWheel: m_wheelMotor->Set(speedToSet); break;
                 case Motor::kAll:
-                    m_climbMotor->Set(speedToSet);
+                    m_forwardClimbMotor->Set(speedToSet);
+                    m_rearClimbMotor->Set(speedToSet);
                     m_translateMotor->Set(speedToSet);
                     m_wheelMotor->Set(speedToSet);
                     break;
@@ -76,7 +89,7 @@ class Climber {
 
             if (action) {
 
-                m_ratchetServo->SetAngle(0);
+                m_ratchetServo->SetAngle(15);
             }
             else {
 
@@ -90,7 +103,9 @@ class Climber {
         };
 
     private:
-        frc::VictorSP *m_climbMotor;
+        rev::CANSparkMax *m_forwardClimbMotor;
+        rev::CANSparkMax *m_rearClimbMotor;
+
         frc::VictorSP *m_translateMotor;
         frc::VictorSP *m_wheelMotor;
 

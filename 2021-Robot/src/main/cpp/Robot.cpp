@@ -29,7 +29,7 @@
 #include "auto/steps/LimelightLock.h"
 #include "auto/Recorder.h"
 
-Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
+Climber climber(R_CANIDMotorClimberForward, R_CANIDMotorClimberRear, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::XboxController *playerOne;
 frc::XboxController *playerTwo;
@@ -85,6 +85,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutString("AutoStep::RunPrerecorded::Values", "");
     frc::SmartDashboard::PutString("Recorder::output_file_string", "");
     frc::SmartDashboard::PutNumber("LimelightLock end", .25);
+    frc::SmartDashboard::PutNumber("ANGLE TO SET", 0);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -391,9 +392,14 @@ void Robot::TeleopPeriodic() {
 
     // Sets the servos to a position based on a quintic regression model with
     // respect to the area detected by the limelight
-    double area = limelight.getTargetArea();
+    /*double area = limelight.getTargetArea();
     m_servoPosition = -812.644 * pow(area, 6) + 7108.25 * pow(area, 5) - 24539.6 * pow(area, 4) + 41879.3 * pow(area, 3) - 35627.7 * pow(area, 2) + 12700.6 * area -679.787;
     m_servoPosition = (m_servoPosition < 0 || m_servoPosition > 180) ? (m_servoPosition < 0 ? 0 : 180) : m_servoPosition;
+    if (area < 1.0) {
+
+        m_servoPosition = 19;
+    }*/
+    m_servoPosition = frc::SmartDashboard::GetNumber("ANGLE TO SET", 0);
 
     //Once all layers have been evaluated, write out all of their values.
     //Doing this only once prevents weird bugs in which multiple different
@@ -406,6 +412,17 @@ void Robot::TeleopPeriodic() {
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
     launcher.setServo(Launcher::kSetAngle, m_servoPosition);
+
+    if (playerTwo->GetYButton()) {
+
+        launcher.setBrake(true);
+    }
+    else {
+
+        launcher.setBrake(false);
+    }
+
+    zion.Stop();
 }
 void Robot::DisabledPeriodic() {
 

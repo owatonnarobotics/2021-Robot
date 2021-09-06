@@ -75,6 +75,19 @@ class Launcher {
              }
         }
 
+        void setBrake(const bool brake) {
+
+            if (brake) {
+                
+                launchMotorOne->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+                launchMotorTwo->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+            }
+            else {
+
+                launchMotorOne->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+                launchMotorTwo->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+            }
+        }
 
     private:
         rev::CANSparkMax *indexMotor;

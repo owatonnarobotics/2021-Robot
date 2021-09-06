@@ -37,6 +37,9 @@ const int R_CANIDMotorIntake = 9;
 const int R_CANIDMotorLauncherIndex  = 10;
 const int R_CANIDMotorLauncherLaunchOne = 11;
 const int R_CANIDMotorLauncherLaunchTwo = 12;
+
+const int R_CANIDMotorClimberForward = 14;
+const int R_CANIDMotorClimberRear = 13;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____Controller Settings_____*/
@@ -55,7 +58,7 @@ const double R_deadzoneControllerZ = 0.15;
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_executionCapZion = 1.00;
-const double R_executionCapZionZ = .5;
+const double R_executionCapZionZ = .65;
 //This is at what rate the regular execution cap is scaled for precision driving.
 const double R_executionCapZionPrecision = .15 * R_executionCapZion;
 //This one is for running the intake motors.
