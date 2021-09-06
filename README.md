@@ -1,4 +1,4 @@
-# FRC Team 4624's 2021-Robot-Code
+# FRC Team 4624's 2021-Robot
 All software for the Rebel Alliance's 2021 season and its game, Infinite
 Recharge. This code is a continuation of the Rebel Alliance's 2020 robot
 code, which can be found [here](https://github.com/Wizzrobes/2020-Robot-Code).
