@@ -71,12 +71,12 @@ model {
             sources.cpp {
                 source {
                     srcDir 'src/main/cpp'
-                    srcDirs 'src/swerve/cpp'
+                    srcDirs 'src/swerve/src/cpp'
                     include '**/*.cpp', '**/*.cc'
                 }
                 exportedHeaders {
                     srcDir 'src/main/include'
-                    srcDirs 'src/swerve/include'
+                    srcDirs 'src/swerve/src/include'
                     if (includeSrcInIncludeRoot) {
                         srcDir 'src/main/cpp'
                     }
